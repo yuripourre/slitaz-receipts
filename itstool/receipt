@@ -3,7 +3,7 @@
 PACKAGE="itstool"
 VERSION="2.0.2"
 CATEGORY="utilities"
-LICENSE=""
+LICENSE="GPL3"
 SHORT_DESC="Itstool is used to create translated XML files."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.bz2"
