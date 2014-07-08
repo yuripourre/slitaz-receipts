@@ -15,9 +15,8 @@ BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant java-jdk"
 
 compile_rules()
 {
-  tar xzf $TARBALL
-  cd $PREFIX
-  export JAVA_HOME=/usr/lib/jvm/java-icedtea/
+  cd $src
+  export JAVA_HOME=$install/usr/lib/jvm/java-icedtea/
   ant clean all
   ant install
 }
