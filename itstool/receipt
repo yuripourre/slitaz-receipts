@@ -4,11 +4,11 @@ PACKAGE="itstool"
 VERSION="2.0.2"
 CATEGORY="utilities"
 LICENSE=""
-SHORT_DESC="Itstool extracts messages from XML files and outputs PO template files, then merges translations from MO files to create translated XML files. It determines what to translate and how to chunk it into messages using the W3C Internationalization Tag Set (ITS)."
+SHORT_DESC="Itstool is used to create translated XML files."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-$VERSION.tar.xz"
+TARBALL="$PACKAGE-$VERSION.tar.bz2"
 WEB_SITE=""
-WGET_URL="http://ftp.gnome.org/pub/gnome/sources/yelp-xsl/$MAJOR_VERSION/$TARBALL"
+WGET_URL="http://files.itstool.org/itstool/$TARBALL"
 
 BUILD_DEPENDS="docbook-xml docbook-xsl python libxml2-python"
 
@@ -27,5 +27,7 @@ genpkg_rules()
 {
 	mkdir -p $fs/usr/bin
 	cp -a $install/usr/bin $fs/usr
+	mkdir -p $fs/usr/share
+	cp -a $install/usr/share $fs/usr
 }
 
