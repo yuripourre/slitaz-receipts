@@ -1,32 +1,33 @@
 # SliTaz package receipt.
 
 PACKAGE="v4l4j"
-VERSION="0.1"
+VERSION="0.9.1"
 CATEGORY="development"
 SHORT_DESC="Install v4l4j - A java package to access the Capture interface of the Video4Linux API"
 MAINTAINER="yuripourre@gmail.com"
 LICENSE="GPLv3"
 WEB_SITE="http://code.google.com/p/v4l4j/"
-
-OBVERSION="0.9.1"
-PREFIX="v4l4j-$OBVERSION"
-TARBALL="$PREFIX.tar.gz"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
 WGET_URL="http://v4l4j.googlecode.com/files/$TARBALL"
 
-DEPENDS="libv4l jpeg java-jdk"
-BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant"
+DEPENDS="libv4l jpeg"
+BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant java-jdk"
 
 compile_rules()
 {
   tar xzf $TARBALL
   cd $PREFIX
   export JAVA_HOME=/usr/lib/jvm/java-icedtea/
-
   ant clean all
+  ant install
 }
 
 # Rules to gen a SliTaz package suitable for Tazpkg.
 genpkg_rules()
 {
-  ant install
+	mkdir -p $fs/usr/lib/jni
+	cp -R $install/usr/lib/ $fs/usr
+
+	mkdir -p $fs/usr/share/java
+	cp -R $install/usr/share/java $fs/usr/share
 }
