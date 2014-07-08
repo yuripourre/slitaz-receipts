@@ -10,7 +10,7 @@ TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE=""
 WGET_URL="http://ftp.gnome.org/pub/gnome/sources/yelp-xsl/$MAJOR_VERSION/$TARBALL"
 
-BUILD_DEPENDS="libxml2-python"
+BUILD_DEPENDS="docbook-xml docbook-xsl python libxml2-python"
 
 # Rules to configure and make the package.
 compile_rules()
