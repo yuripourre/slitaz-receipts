@@ -1,0 +1,31 @@
+# SliTaz package receipt.
+
+PACKAGE="itstool"
+VERSION="2.0.2"
+CATEGORY="utilities"
+LICENSE=""
+SHORT_DESC="Itstool extracts messages from XML files and outputs PO template files, then merges translations from MO files to create translated XML files. It determines what to translate and how to chunk it into messages using the W3C Internationalization Tag Set (ITS)."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE=""
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/yelp-xsl/$MAJOR_VERSION/$TARBALL"
+
+BUILD_DEPENDS="libxml2-python"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	cd $src
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/bin
+	cp -a $install/usr/bin $fs/usr
+}
+
