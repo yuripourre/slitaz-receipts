@@ -1,0 +1,33 @@
+# SliTaz package receipt.
+
+PACKAGE="yelp-xsl"
+MAJOR_VERSION="3.12"
+VERSION="$MAJOR_VERSION.0"
+CATEGORY="utilities"
+LICENSE=""
+SHORT_DESC="The Yelp XSL package contains XSL stylesheets that are used by the Yelp help browser to format Docbook and Mallard documents."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE=""
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/yelp-xsl/$MAJOR_VERSION/$TARBALL"
+
+DEPENDS="libxslt itstool intltool"
+BUILD_DEPENDS="libxslt-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	cd $src
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/share
+	cp -a $install/usr/share $fs/usr
+}
+
