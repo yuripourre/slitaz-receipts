@@ -1,15 +1,14 @@
 # SliTaz package receipt.
 
 PACKAGE="gnome-terminal"
-VERSION="3.12"
-OBVERSION="3.12.3"
+VERSION="3.12.3"
 CATEGORY="utilities"
 LICENSE="GPL3"
-SHORT_DESC="GNOME Terminal is a terminal emulator for the GNOME desktop environment written by Havoc Pennington and others."
+SHORT_DESC="GNOME Terminal is a terminal emulator for the GNOME desktop."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-$OBVERSION.tar.xz"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="https://wiki.gnome.org/Apps/Terminal"
-WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/$VERSION/$TARBALL"
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
 
 DEPENDS="dconf libgio util-linux-uuid"
 BUILD_DEPENDS="dconf-dev libgio-dev util-linux-uuid-dev vte gsettings-desktop-schemas"
