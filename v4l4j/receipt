@@ -11,11 +11,10 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WGET_URL="http://v4l4j.googlecode.com/files/$TARBALL"
 
 DEPENDS="libv4l jpeg java-jdk"
-BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant"
+BUILD_DEPENDS="pkg-config libv4l-dev jpeg-dev apache-ant"
 
 compile_rules()
 {
-	cd $src
 	export JAVA_HOME=$install/usr/lib/jvm/java-icedtea/
 	ant clean all
 	ant install
