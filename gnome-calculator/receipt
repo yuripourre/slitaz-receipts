@@ -1,0 +1,15 @@
+# SliTaz package receipt.
+
+PACKAGE="gnome-calculator"
+VERSION="3.12"
+OBVERSION="3.12.3"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="GNOME Calculator is a powerful graphical calculator with financial, logical and scientific modes."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$OBVERSION.tar.xz"
+WEB_SITE="https://wiki.gnome.org/Apps/Calculator"
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/$VERSION/$TARBALL"
+
+DEPENDS="gtk+3 libxml2 xorg-libXext xorg-libXinerama xorg-libXi xorg-libXrandr xorg-libXcursor xorg-libXcomposite xorg-libXdamage gtksourceview3 yelp-xsl"
+BUILD_DEPENDS="gtk+3-dev libxml2 xorg-libXext-dev xorg-libXinerama-dev xorg-libXi-dev xorg-libXrandr-dev xorg-libXcursor-dev xorg-libXcomposite-dev xorg-libXdamage-dev gtksourceview3-dev"
