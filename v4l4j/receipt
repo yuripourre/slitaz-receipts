@@ -10,23 +10,24 @@ WEB_SITE="http://code.google.com/p/v4l4j/"
 TARBALL="$PACKAGE-$VERSION.tar.gz"
 WGET_URL="http://v4l4j.googlecode.com/files/$TARBALL"
 
-DEPENDS="libv4l jpeg"
-BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant java-jdk"
+DEPENDS="libv4l jpeg java-jdk"
+BUILD_DEPENDS="make gcc wget pkg-config libv4l-dev jpeg-dev apache-ant"
 
 compile_rules()
 {
-  cd $src
-  export JAVA_HOME=$install/usr/lib/jvm/java-icedtea/
-  ant clean all
-  ant install
+	cd $src
+	export JAVA_HOME=$install/usr/lib/jvm/java-icedtea/
+	ant clean all
+	ant install
 }
 
 # Rules to gen a SliTaz package suitable for Tazpkg.
 genpkg_rules()
 {
-	mkdir -p $fs/usr/lib/jni
-	cp -R $install/usr/lib/ $fs/usr
+	mkdir -p $fs/usr/lib/jni $fs/usr/share/java
+	
+	cp -a $install/usr/lib $fs/usr
 
-	mkdir -p $fs/usr/share/java
-	cp -R $install/usr/share/java $fs/usr/share
+	cp -a $install/usr/share $fs/usr
+	
 }
