@@ -1,0 +1,22 @@
+# SliTaz package receipt.
+
+PACKAGE="gtksourceview3-dev"
+VERSION="3.12.2"
+CATEGORY="development"
+SHORT_DESC="The gtksourceview library devel files."
+MAINTAINER="yuripourre@gmail.com"
+LICENSE="GPL2"
+WANTED="gtksourceview3"
+WEB_SITE="http://projects.gnome.org/gtksourceview/"
+
+DEPENDS="gtksourceview3 pkg-config"
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib $fs/usr/share
+	cp -a $install/usr/lib/*.*a $fs/usr/lib
+	cp -a $install/usr/lib/pkgconfig $fs/usr/lib
+	cp -a $install/usr/include $fs/usr
+}
+

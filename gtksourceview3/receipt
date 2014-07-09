@@ -1,0 +1,38 @@
+# SliTaz package receipt.
+
+PACKAGE="gtksourceview3"
+VERSION="3.12.2"
+CATEGORY="x-window"
+SHORT_DESC="Extends GTK+ framework for multiline text editing."
+MAINTAINER="yuripourre@gmail.com"
+LICENSE="GPL2"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE="http://projects.gnome.org/gtksourceview/"
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
+
+DEPENDS="expat gtk+3 libxml2 xorg-libX11 xorg-libXau xorg-libXcomposite \
+xorg-libXcursor xorg-libXdmcp xorg-libXext xorg-libXfixes xorg-libXinerama \
+xorg-libXrandr xorg-libXrender xorg-libXdamage"
+BUILD_DEPENDS="intltool pkg-config gtk+3-dev libxml2-dev expat-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	cd $src
+	./configure \
+		--prefix=/usr \
+		--infodir=/usr/share/info \
+		--mandir=/usr/share/man \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib $fs/usr/share
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+	cp -a $install/usr/share/gtksourceview* $fs/usr/share
+}
+
