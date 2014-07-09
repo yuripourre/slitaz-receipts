@@ -11,5 +11,5 @@ TARBALL="$PACKAGE-$OBVERSION.tar.xz"
 WEB_SITE="https://wiki.gnome.org/Apps/Terminal"
 WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/$VERSION/$TARBALL"
 
-DEPENDS="dconf"
-BUILD_DEPENDS="dconf-dev uuid gio vte gsettings-desktop-schemas"
+DEPENDS="dconf libgio util-linux-uuid"
+BUILD_DEPENDS="dconf-dev libgio-dev util-linux-uuid-dev vte gsettings-desktop-schemas"
