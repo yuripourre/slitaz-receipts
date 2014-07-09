@@ -7,7 +7,7 @@ LICENSE="GPL3"
 SHORT_DESC="Itstool is used to create translated XML files."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.bz2"
-WEB_SITE=""
+WEB_SITE="http://itstool.org/"
 WGET_URL="http://files.itstool.org/itstool/$TARBALL"
 
 BUILD_DEPENDS="docbook-xml docbook-xsl python libxml2-python"
