@@ -3,7 +3,7 @@
 PACKAGE="v4l4j"
 VERSION="0.9.1"
 CATEGORY="development"
-SHORT_DESC="Install v4l4j - A java package to access the Capture interface of the Video4Linux API"
+SHORT_DESC="v4l4j is a java JNI wrapper to access the Video4Linux API."
 MAINTAINER="yuripourre@gmail.com"
 LICENSE="GPL3"
 WEB_SITE="http://code.google.com/p/v4l4j/"
@@ -23,10 +23,7 @@ compile_rules()
 # Rules to gen a SliTaz package suitable for Tazpkg.
 genpkg_rules()
 {
-	mkdir -p $fs/usr/lib/jni $fs/usr/share/java
-	
+	mkdir -p $fs/usr
 	cp -a $install/usr/lib $fs/usr
-
-	cp -a $install/usr/share $fs/usr
-	
+	cp -a $install/usr/share $fs/usr	
 }
