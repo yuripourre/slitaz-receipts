@@ -10,5 +10,18 @@ TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="https://wiki.gnome.org/Apps/Terminal"
 WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
 
-DEPENDS="dconf libgio util-linux-uuid"
-BUILD_DEPENDS="dconf-dev libgio-dev util-linux-uuid-dev vte gsettings-desktop-schemas"
+DEPENDS="appdata-tools dconf libgio util-linux-uuid vte"
+BUILD_DEPENDS="dconf-dev libgio-dev util-linux-uuid-dev vte-dev gsettings-desktop-schemas"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr             \
+		--disable-static          \
+		--disable-migration       \
+		--disable-search-provider &&
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
