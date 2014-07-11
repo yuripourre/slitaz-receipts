@@ -1,0 +1,6 @@
+appdata-tools
+needs: glib 2.36.4+
+
+glib 2.41.1
+needs: automake 1.14.1
+needs: pcre 8.31+
