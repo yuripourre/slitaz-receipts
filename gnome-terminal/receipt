@@ -25,3 +25,9 @@ compile_rules()
 	make &&
 	make DESTDIR=$DESTDIR install
 }
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/ $fs
+}
