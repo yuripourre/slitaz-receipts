@@ -1,9 +1,7 @@
-appdata-tools
-needs: glib 2.36.4+
+gnome-calculator (3.12.2)
+needs: gtk3+
 
-glib 2.41.1
-glib-dev 2.41.1
-needs: automake 1.14.1
-needs: pcre 8.31+
-
-
+gtk3+ (3.12.2)
+needs: atk 2.7.5
+needs: pango 1.32.4
+needs: gdk-pixbuf 2.27.1
