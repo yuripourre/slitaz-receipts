@@ -1,5 +1,7 @@
 gnome-calculator (3.12.2)
-needs: gtk3+
+gnome-terminal (3.12.2)
+gnome-desktop (3.12.2)
+needs: gtk3+ (3.12.2)
 
 gtk3+ (3.12.2)
 needs: atk 2.7.5
