@@ -3,8 +3,11 @@ gnome-terminal (3.12.2)
 gnome-desktop (3.12.2)
 needs: gtk3+ (3.12.2)
 
-gtk3+ (3.12.2)
+gtk+3 (3.12.2)
+gtk+3-demo (3.12.2)
+gtk+3-dev (3.12.2)
 needs: atk 2.7.5
+needs: atk-bridge 2.0+
 needs: pango 1.32.4+
 needs: gdk-pixbuf 2.27.1
 
