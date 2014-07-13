@@ -2,7 +2,7 @@
 
 PACKAGE="at-spi2-core"
 VERSION="2.12.0"
-CATEGORY="Accessibility toolkit."
+CATEGORY="libdevel"
 LICENSE="GPL3"
 SHORT_DESC="Bridges ATK to At-Spi2 D-Bus service."
 MAINTAINER="yuripourre@gmail.com"
@@ -10,8 +10,8 @@ TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="http://www.gnome.org/"
 WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
 
-DEPENDS="dbus glib gobject-introspection"
-BUILD_DEPENDS="dbus-dev glib-dev gobject-ins gobject-introspection-dev"
+DEPENDS="dbus glib gobject-introspection util-linux-uuid"
+BUILD_DEPENDS="dbus-dev glib-dev gobject-introspection-dev util-linux-uuid-dev"
 
 # Rules to configure and make the package.
 compile_rules()
