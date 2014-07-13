@@ -1,0 +1,29 @@
+# SliTaz package receipt.
+
+PACKAGE="gnome-screenshot"
+VERSION="3.12.0"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="The GNOME Screenshot is an utility used for taking screenshots of the screen."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE="https://help.gnome.org/users/gnome-help/stable/screen-shot-record.html.en"
+WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
+
+DEPENDS="gtk+3 libcanberra"
+BUILD_DEPENDS="gtk+3-dev libcanberra-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	cp -a $install/usr $fs
+}
