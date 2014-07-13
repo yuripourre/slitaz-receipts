@@ -5,5 +5,12 @@ needs: gtk3+ (3.12.2)
 
 gtk3+ (3.12.2)
 needs: atk 2.7.5
-needs: pango 1.32.4
+needs: pango 1.32.4+
 needs: gdk-pixbuf 2.27.1
+
+pango (1.32.6)
+needs: cairo (1.12.10+)
+needs: cairo-dev (1.12.10+)
+needs: cairo-gl (1.12.10+)
+needs: cairo-gl-dev (1.12.10+)
+needs: harfbuzz
