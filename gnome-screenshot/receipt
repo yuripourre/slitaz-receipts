@@ -8,7 +8,8 @@ SHORT_DESC="The GNOME Screenshot is an utility used for taking screenshots of th
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="https://help.gnome.org/users/gnome-help/stable/screen-shot-record.html.en"
-WGET_URL="http://ftp.gnome.org/pub/gnome/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
+GNOME_MIRROR="http://ftp.gnome.org/pub/gnome/sources"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/${VERSION%.*}/$TARBALL"
 
 DEPENDS="gtk+3 libcanberra"
 BUILD_DEPENDS="gtk+3-dev libcanberra-dev"
