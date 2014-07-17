@@ -1,0 +1,30 @@
+# SliTaz package receipt.
+
+PACKAGE="thermald"
+VERSION="1.3.rc1-1"
+CATEGORY="daemons"
+LICENSE="GPL2"
+SHORT_DESC="Bridges ATK to At-Spi2 D-Bus service."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="v$VERSION.tar.xz"
+WEB_SITE="https://github.com/01org/thermal_daemon"
+WGET_URL="$WEB_SITE/archive/$TARBALL"
+
+DEPENDS="dbus"
+BUILD_DEPENDS="dbus-dev libxml2"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./autogen.sh
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	cp -a $install/usr $fs
+}
