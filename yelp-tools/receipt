@@ -1,0 +1,30 @@
+# SliTaz package receipt.
+
+PACKAGE="yelp-tools"
+VERSION="3.12.0"
+CATEGORY="utilities"
+LICENSE="GPL2"
+SHORT_DESC="Tools to create documentation."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE="https://wiki.gnome.org/Apps/Yelp/Tools"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/${VERSION%.*}/$TARBALL"
+
+DEPENDS=""
+BUILD_DEPENDS="yelp-xsl"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/share $fs/usr
+}
