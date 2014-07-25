@@ -6,12 +6,12 @@ CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="MATE Terminal is a terminal emulator for the MATE desktop."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-$VERSION.tar.xz"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
 DEPENDS="gtk+ GConf util-linux-uuid vte"
-BUILD_DEPENDS="gtk+-dev GConf-dev util-linux-uuid-dev vte-dev"
+BUILD_DEPENDS="gtk+-dev GConf-dev util-linux-uuid-dev vte-dev wget"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -40,7 +40,7 @@ post_install()
 	#chroot "$1/" /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas
 }
 
-post-remove()
+post_remove()
 {
 	echo "Processing post-remove commands..."
 	#chroot "$1/" /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas
