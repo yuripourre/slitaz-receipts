@@ -8,7 +8,7 @@ SHORT_DESC="The Yelp XSL package contains XSL stylesheets that are used by the Y
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="https://wiki.gnome.org/Apps/Yelp"
-WGET_URL="http://ftp.gnome.org/pub/gnome/sources/yelp-xsl/${VERSION%.*}/$TARBALL"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/${VERSION%.*}/$TARBALL"
 
 DEPENDS="libxslt itstool intltool"
 BUILD_DEPENDS="libxslt-dev"
