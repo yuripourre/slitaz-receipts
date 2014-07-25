@@ -11,7 +11,7 @@ WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
 DEPENDS=""
-BUILD_DEPENDS="wget"
+BUILD_DEPENDS="wget autoconf automake"
 
 # Rules to configure and make the package.
 compile_rules()
