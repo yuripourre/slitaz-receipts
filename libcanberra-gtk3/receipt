@@ -1,0 +1,35 @@
+# SliTaz package receipt.
+
+PACKAGE="libcanberra-gtk3"
+VERSION="0.30"
+CATEGORY="development"
+SHORT_DESC="Portable Sound Event Library"
+MAINTAINER="yuripourre@gmail.com"
+LICENSE="LGPL2.1"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE="http://0pointer.de/lennart/projects/libcanberra/"
+WGET_URL="$WEB_SITE/$TARBALL"
+
+DEPENDS="libvorbis libogg gstreamer alsa-lib glib libgio"
+BUILD_DEPENDS="libvorbis-dev libogg-dev gstreamer-dev alsa-lib-dev vala \
+gtk+3-dev libtool glib-dev libgio-dev libxml2-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	cd $src
+	./configure \
+		--enable-gtk \
+		$CONFIGURE_ARGS &&
+	make &&
+	make install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib/$PACKAGE-$VERSION
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+	# We could split package in libcanberra-modules to avoid gstreamer dep.
+	cp -a $install/usr/lib/$PACKAGE-$VERSION/*.so $fs/usr/lib/$PACKAGE-$VERSION
+}
