@@ -1,0 +1,30 @@
+# SliTaz package receipt.
+
+PACKAGE="libsecret"
+VERSION="0.16"
+CATEGORY="libdevel"
+LICENSE="GPL3"
+SHORT_DESC="A library for storing and retrieving passwords."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
+WEB_SITE="https://developer.gnome.org/libsecret/"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/$VERSION%/$TARBALL"
+
+DEPENDS="glib libgcrypt gnome-keyring"
+BUILD_DEPENDS="glib-dev libgcrypt-dev gobject-introspection"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr \
+		--disable-static && \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	cp -a $install/usr $fs
+}
