@@ -34,8 +34,8 @@ compile_rules()
 genpkg_rules()
 {
 	# Saving some space
-	rm -Rf $install/usr/share/man
-	rm -Rf $install/usr/share/help
+	rm -rf $install/usr/share/man
+	rm -rf $install/usr/share/help
 
 	mkdir -p $fs/usr
 	cp -a $install/usr $fs

@@ -12,7 +12,7 @@ WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
 DEPENDS="gtk+ gdk-pixbuf"
 BUILD_DEPENDS="wget cacerts autoconf automake dconf-dev libtool itstool \
-mate-common gtk-doc gtk+-dev gdk-pixbuf-dev"
+mate-common gtk-doc gtk+-dev gdk-pixbuf-dev yelp-tools harfbuzz-dev"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -27,7 +27,7 @@ compile_rules()
 # Rules to gen a SliTaz package suitable for Tazpkg.
 genpkg_rules()
 {
-	mkdir -p $fs/usr
+	mkdir -p $fs/usr/lib
 	cp -a $install/usr/bin $fs/usr
 	cp -a $install/usr/share $fs/usr
 	cp -a $install/usr/lib/*.so* $fs/usr/lib
