@@ -1,0 +1,34 @@
+# SliTaz package receipt.
+
+PACKAGE="orca"
+VERSION="2.91.93"
+CATEGORY="acessibility"
+LICENSE="LGPL"
+SHORT_DESC="A screen reader based on GTK."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WEB_SITE="http://www.gnome.org/projects/orca"
+WGET_URL="$GNOME_MIRROR/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
+
+DEPENDS="api-spi2-atk dbus-python python-xdg speech-dispatcher \
+hicolor-icon-theme xorg-xmodmap gsettings-desktop-schemas"
+BUILD_DEPENDS="itstool intltool gnome-doc-utils-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./autogen.sh                   \
+	./configure                    \
+		--prefix=/usr          \
+		--sysconfdir=/etc      \
+		--localstatedir=/var   \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr $fs
+}
