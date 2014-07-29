@@ -2,11 +2,11 @@
 
 PACKAGE="liblouis"
 VERSION="2.5.2-3"
-CATEGORY="acessibility"
+CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Open-source braille translator and back-translator."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-${VERSION%.*}.tar.gz"
+TARBALL="$PACKAGE-${VERSION:0:5}.tar.gz"
 WEB_SITE="https://code.google.com/p/liblouis/"
 WGET_URL="http://liblouis.googlecode.com/files/$TARBALL"
 
@@ -16,14 +16,19 @@ BUILD_DEPENDS="help2man python-dev"
 # Rules to configure and make the package.
 compile_rules()
 {
-	cd python
-	LD_PRELOAD+=":$src/$PACKAGE-${VERSION%.*}/liblouis/.libs/liblouis.so"
-	python2 setup.py install --root="$install" --prefix="/usr" --optimize=1
-	python setup.py install --root="$install" --prefix="/usr" --optimize=1
+	./configure                    \
+		--prefix=/usr          \
+		--disable-static       \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
 }
 
 genpkg_rules()
 {
 	mkdir -p $fs/usr
+	LD_PRELOAD+=":$src/liblouis/.libs/liblouis.so"
+	python $src/python/setup.py install \
+		--root="$install" --prefix="/usr" --optimize=1
 	cp -a $install/usr $fs
 }

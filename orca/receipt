@@ -17,7 +17,6 @@ BUILD_DEPENDS="itstool intltool gnome-doc-utils-dev"
 # Rules to configure and make the package.
 compile_rules()
 {
-	./autogen.sh                   \
 	./configure                    \
 		--prefix=/usr          \
 		--sysconfdir=/etc      \
