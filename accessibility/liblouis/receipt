@@ -11,7 +11,8 @@ WEB_SITE="https://code.google.com/p/liblouis/"
 WGET_URL="http://liblouis.googlecode.com/files/$TARBALL"
 
 DEPENDS="glibc"
-BUILD_DEPENDS="help2man python-dev"
+BUILD_DEPENDS="python-dev"
+SUGGESTED="help2man"
 
 # Rules to configure and make the package.
 compile_rules()
