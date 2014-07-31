@@ -1,0 +1,23 @@
+# SliTaz package receipt.
+
+PACKAGE="icedtea7-jre"
+VERSION="2.5.1"
+CATEGORY="development"
+SHORT_DESC="A Free Software harness for OpenJDK JRE."
+MAINTAINER="yuripourre@gmail.com"
+LICENSE="GPL2"
+WEB_SITE="http://www.iced-tea.org/"
+WANTED="icedtea7-jdk"
+SOURCE="icedtea7"
+
+DEPENDS="glibc-base gcc-lib-base util-linux-uuid alsa-lib freetype giflib libjpeg libpng zlib \
+xorg-libICE xorg-libSM xorg-libX11 xorg-libXau xorg-libXdmcp xorg-libXext \
+xorg-libXi xorg-libXrender xorg-libXtst"
+BUILD_DEPENDS=""
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib/jvm/java-icedtea
+	cp -a $install/usr/lib/jvm/java-icedtea/jre $fs/usr/lib/jvm/java-icedtea
+}
