@@ -8,11 +8,11 @@ SHORT_DESC="A screen reader based on GTK."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.gnome.org/projects/orca"
-WGET_URL="$GNOME_MIRROR/sources/$PACKAGE/${VERSION%.*}/$TARBALL"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/${VERSION%.*}/$TARBALL"
 
 DEPENDS="api-spi2-atk dbus-python python-xdg speech-dispatcher \
-hicolor-icon-theme xorg-xmodmap gsettings-desktop-schemas"
-BUILD_DEPENDS="itstool intltool gnome-doc-utils-dev"
+hicolor-icon-theme xorg-xmodmap gsettings-desktop-schemas liblouis"
+BUILD_DEPENDS="itstool intltool gnome-doc-utils-dev liblouis-dev"
 
 # Rules to configure and make the package.
 compile_rules()
