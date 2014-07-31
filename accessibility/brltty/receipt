@@ -6,7 +6,7 @@ CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Open-source braille translator and back-translator."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-VERSION.tar.xz"
+TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="http://mielke.cc/brltty/"
 WGET_URL="http://mielke.cc/brltty/archive/$TARBALL"
 
