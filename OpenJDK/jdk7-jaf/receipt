@@ -3,7 +3,7 @@
 PACKAGE="jdk7-jaf"
 VERSION="2010_08_19"
 CATEGORY="meta"
-SHORT_DESC="A component of OpenJDK 7 we use to cook icedtea7 (empty package)"
+SHORT_DESC="A component of Sun's JDK 7 we use to cook icedtea7 (empty package)"
 MAINTAINER="yuripourre@gmail.com"
 LICENSE="GPL2"
 TARBALL="$PACKAGE-$VERSION.zip"
