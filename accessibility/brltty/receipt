@@ -1,0 +1,35 @@
+# SliTaz package receipt.
+
+PACKAGE="brltty"
+VERSION="5.1"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="Open-source braille translator and back-translator."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-VERSION.tar.xz"
+WEB_SITE="http://mielke.cc/brltty/"
+WGET_URL="http://mielke.cc/brltty/archive/$TARBALL"
+
+DEPENDS="gpm icu"
+BUILD_DEPENDS="python-cython gpm-dev tcl"
+SUGGESTED="at-spi2 at-spi-atk bluez"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure                    \
+		--prefix=/usr          \
+		--disable-static       \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/share $fs/usr
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+}
