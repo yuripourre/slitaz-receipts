@@ -1,0 +1,36 @@
+Submitted By: Pierre Labastie <pierre DOT labastie AT neuf DOT fr>
+Date: 2014-05-31
+Initial Package Version: 2.4.7
+Upstream Status: Unknown
+Origin: self
+Description: fixes usage of new giflib API. To be applied after the
+             "fixed_paths" patch.
+
+diff -Naur icedtea-2.4.7/Makefile.am icedtea-2.4.7.new/Makefile.am
+--- icedtea-2.4.7/Makefile.am	2014-05-30 22:41:23.729055726 +0200
++++ icedtea-2.4.7.new/Makefile.am	2014-05-30 22:42:47.957055726 +0200
+@@ -262,6 +262,8 @@
+ 
+ DISTRIBUTION_PATCHES = patches/lfs-fixed-paths.patch
+ 
++OPENJDK_PATCHES = patches/fix-new-giflib.patch
++
+ # Conditional patches
+ 
+ if WITH_RHINO
+diff -Naur icedtea-2.4.7/patches/fix-new-giflib.patch icedtea-2.4.7.new/patches/fix-new-giflib.patch
+--- icedtea-2.4.7/patches/fix-new-giflib.patch	1970-01-01 01:00:00.000000000 +0100
++++ icedtea-2.4.7.new/patches/fix-new-giflib.patch	2014-05-30 22:50:04.861055726 +0200
+@@ -0,0 +1,12 @@
++diff -Naur jdk-9448fff93286/src/share/native/sun/awt/splashscreen/splashscreen_gif.c jdk-9448fff93286.new/src/share/native/sun/awt/splashscreen/splashscreen_gif.c
++--- jdk-9448fff93286/src/share/native/sun/awt/splashscreen/splashscreen_gif.c	2014-04-12 01:23:06.000000000 +0200
+++++ jdk-9448fff93286.new/src/share/native/sun/awt/splashscreen/splashscreen_gif.c	2014-05-30 22:47:59.686055726 +0200
++@@ -310,7 +310,7 @@
++     free(pBitmapBits);
++     free(pOldBitmapBits);
++ 
++-    DGifCloseFile(gif);
+++    DGifCloseFile(gif, NULL);
++ 
++     return 1;
++ }

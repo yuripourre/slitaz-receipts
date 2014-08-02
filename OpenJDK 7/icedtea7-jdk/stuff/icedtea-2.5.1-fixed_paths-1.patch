@@ -1,0 +1,78 @@
+Submitted By: DJ Lucas <dj AT linuxfromscratch DOT org>
+Date: 2012-05-30
+Initial Package Version: 1.9
+Upstream Status: Not applicable
+Origin: self
+Description: fixes path for utilities as installed in LFS
+
+diff -Naur icedtea-2.2-orig/Makefile.am icedtea-2.2/Makefile.am
+--- icedtea-2.2-orig/Makefile.am	2012-05-30 22:13:29.000000000 -0500
++++ icedtea-2.2/Makefile.am	2012-05-30 22:15:30.000000000 -0500
+@@ -258,6 +258,8 @@
+ 
+ ICEDTEA_PATCHES = 
+ 
++DISTRIBUTION_PATCHES = patches/lfs-fixed-paths.patch
++
+ # Conditional patches
+ 
+ if WITH_RHINO
+diff -Naur icedtea-2.2-orig/patches/lfs-fixed-paths.patch icedtea-2.2/patches/lfs-fixed-paths.patch
+--- icedtea-2.2-orig/patches/lfs-fixed-paths.patch	1969-12-31 18:00:00.000000000 -0600
++++ icedtea-2.2/patches/lfs-fixed-paths.patch	2012-05-30 22:16:50.000000000 -0500
+@@ -0,0 +1,55 @@
++diff -Nru openjdk.orig/corba/make/common/shared/Defs-utils.gmk openjdk/corba/make/common/shared/Defs-utils.gmk
++--- openjdk-orig/corba/make/common/shared/Defs-utils.gmk	2010-06-21 16:11:20.000000000 -0500
+++++ openjdk/corba/make/common/shared/Defs-utils.gmk	2011-01-11 01:30:48.000000000 -0600
++@@ -88,12 +88,12 @@
++ EGREP          = $(UTILS_COMMAND_PATH)egrep
++ EXPR           = $(UTILS_USR_BIN_PATH)expr
++ FILE           = $(UTILS_USR_BIN_PATH)file
++-FIND           = $(UTILS_USR_BIN_PATH)find
+++FIND           = $(UTILS_COMMAND_PATH)find
++ FMT            = $(UTILS_COMMAND_PATH)fmt
++ GDB            = $(UTILS_USR_BIN_PATH)gdb
++ GREP           = $(UTILS_COMMAND_PATH)grep
++ GUNZIP         = $(UTILS_COMMAND_PATH)gunzip
++-HEAD           = $(UTILS_USR_BIN_PATH)head
+++HEAD           = $(UTILS_COMMAND_PATH)head
++ ID             = $(UTILS_COMMAND_PATH)id
++ ISAINFO        = $(UTILS_COMMAND_PATH)isainfo
++ KSH            = $(UTILS_COMMAND_PATH)ksh
++@@ -125,7 +125,7 @@
++ TAIL           = $(UTILS_USR_BIN_PATH)tail
++ TAR            = $(UTILS_COMMAND_PATH)tar
++ TEST           = $(UTILS_USR_BIN_PATH)test
++-TOUCH          = $(UTILS_COMMAND_PATH)touch
+++TOUCH          = $(UTILS_USR_BIN_PATH)touch
++ TR             = $(UTILS_USR_BIN_PATH)tr
++ TRUE           = $(UTILS_COMMAND_PATH)true
++ UNAME          = $(UTILS_COMMAND_PATH)uname
++--- openjdk-orig/jdk/make/common/shared/Defs-utils.gmk	2012-04-16 02:09:00.000000000 +0000
+++++ openjdk/jdk/make/common/shared/Defs-utils.gmk	2012-04-16 02:10:44.000000000 +0000
++@@ -104,14 +104,14 @@
++ EGREP          = $(UTILS_COMMAND_PATH)egrep
++ EXPR           = $(UTILS_USR_BIN_PATH)expr
++ FILE           = $(UTILS_USR_BIN_PATH)file
++-FIND           = $(UTILS_USR_BIN_PATH)find
+++FIND           = $(UTILS_COMMAND_PATH)find
++ FMT            = $(UTILS_COMMAND_PATH)fmt
++ GDB            = $(UTILS_USR_BIN_PATH)gdb
++ GREP           = $(UTILS_COMMAND_PATH)grep
++ GUNZIP         = $(UTILS_COMMAND_PATH)gunzip
++ # GZIP is used for solaris. Linux and windows use tar czf
++ GZIP           = $(UTILS_COMMAND_PATH)gzip
++-HEAD           = $(UTILS_USR_BIN_PATH)head
+++HEAD           = $(UTILS_COMMAND_PATH)head
++ HG             = hg
++ ID             = $(UTILS_COMMAND_PATH)id
++ ISAINFO        = $(UTILS_COMMAND_PATH)isainfo
++@@ -140,7 +140,7 @@
++ TAIL           = $(UTILS_USR_BIN_PATH)tail
++ TAR            = $(UTILS_COMMAND_PATH)tar
++ TEST           = $(UTILS_USR_BIN_PATH)test
++-TOUCH          = $(UTILS_COMMAND_PATH)touch
+++TOUCH          = $(UTILS_USR_BIN_PATH)touch
++ TR             = $(UTILS_USR_BIN_PATH)tr
++ TRUE           = $(UTILS_COMMAND_PATH)true
++ UNAME          = $(UTILS_COMMAND_PATH)uname
