@@ -1,38 +1,36 @@
 # SliTaz package receipt.
 
-PACKAGE="icedtea7-jdk"
-SOURCE="icedtea7"
-VERSION="2.5.1"
+PACKAGE="icedtea6-jdk"
+SOURCE="icedtea6"
+VERSION="1.9.7"
 CATEGORY="development"
 SHORT_DESC="A Free Software harness for OpenJDK."
-MAINTAINER="yuripourre@gmail.com"
+MAINTAINER="rcx@zoominternet.net"
 LICENSE="GPL2"
-TARBALL="$SOURCE-$VERSION.tar.xz"
+TARBALL="$SOURCE-$VERSION.tar.gz"
 WEB_SITE="http://www.iced-tea.org/"
-WGET_URL="http://icedtea.wildebeest.org/download/source/$TARBALL"
+WGET_URL="http://icedtea.classpath.org/download/source/$TARBALL"
 
-DEPENDS="icedtea7-jre xorg xorg-libXtst xorg-libXp cups"
+DEPENDS="icedtea6-jre xorg xorg-libXtst xorg-libXp cups"
 BUILD_DEPENDS="gcc+gcj autoconf automake m4 diffutils gawk cups-dev wget cpio \
 coreutils-file-special coreutils-file-summarize alsa-lib-dev file patch perl \
 zip unzip findutils  bzip2 tar glib-dev fastjar rhino ecj apache-ant jpeg-dev \
 xalan-xerces-j gtk+-dev giflib-dev libpng-dev xorg-dev xorg-libXtst-dev \
-xorg-libXp-dev xorg-dev-proto nss nss-dev jdk7-jaxws jdk7-jaxp jdk7-jaf \
-openjdk-7-src"
+xorg-libXp-dev xorg-dev-proto nss nss-dev jdk6-jaxws jdk6-jaxp jdk6-jaf \
+openjdk-6-src"
 
 # Note to icedtea6 updaters,
 # You should check version into receipts:
-# * jdk7-jaxws (version: $openjdk_version)
-# * jdk7-jaxp (version: $openjdk_version)
-# * jdk7-jaf (version: $openjdk_version)
-# * openjdk-7-src (version: $openjdk_version-$openjdk_date)
+# * jdk6-jaxws (version: $openjdk_version)
+# * jdk6-jaxp (version: $openjdk_version)
+# * jdk6-jaf (version: $openjdk_version)
+# * openjdk-6-src (version: $openjdk_version-$openjdk_date)
 # Theses receipts allow to have source tarballs in SRC.
-openjdk_version="b147"
-openjdk_date="27_jun_2011"
-OPENJDK_SOURCE_FILE="openjdk-7-fcs-src-$openjdk_version-$openjdk_date.tar.gz"
-EXTRA_SOURCE_FILES="jdk7-jaxws-$openjdk_version.zip \
-jdk7-jaxp-$openjdk_version.zip \
-jdk7-jaf-$openjdk_version.zip \
-$OPENJDK_SOURCE_FILE"
+openjdk_version="b20"
+openjdk_date="21_jun_2010"
+EXTRA_SOURCE_FILES="jdk6-jaxws-$openjdk_version.zip \
+jdk6-jaxp-$openjdk_version.zip jdk6-jaf-$openjdk_version.zip \
+openjdk-6-src-$openjdk_version-$openjdk_date.tar.gz"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -60,16 +58,16 @@ compile_rules()
 			cp $SOURCES_REPOSITORY/$i-$openjdk_version.zip drops || return 1
 		done
 		# openjdk-6-src is in BUILD_DEPENDS and must be build like jdk6-* pkgs.
-		[ -s $SOURCES_REPOSITORY/$OPENJDK_SOURCE_FILE ] ||
-		    wget -P $SOURCES_REPOSITORY $REPO/$OPENJDK_SOURCE_FILE
-		cp $SOURCES_REPOSITORY/$OPENJDK_SOURCE_FILE .
+		[ -s $SOURCES_REPOSITORY/openjdk-6-src-$openjdk_version-$openjdk_date.tar.gz ] ||
+		    wget -P $SOURCES_REPOSITORY $REPO/openjdk-6-src-$openjdk_version-$openjdk_date.tar.gz
+		cp $SOURCES_REPOSITORY/openjdk-6-src-$openjdk_version-$openjdk_date.tar.gz .
 	else
 		report open-bloc
-		for i in jdk7-jaxws jdk7-jaxp jdk7-jaf openjdk-7-src; do
+		for i in jdk6-jaxws jdk6-jaxp jdk6-jaf openjdk-6-src; do
 			tazwok get-src $i
 			cp $SOURCES_REPOSITORY/$i-$openjdk_version.zip drops
 		done
-		cp $SOURCES_REPOSITORY/$OPENJDK_SOURCE_FILE .
+		cp $SOURCES_REPOSITORY/openjdk-6-src-$openjdk_version-$openjdk_date.tar.gz .
 		report step "Running compilation"
 	fi
 
