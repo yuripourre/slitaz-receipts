@@ -81,7 +81,7 @@ EOT
 		-e 's/--check/-c/' \
 		-e 's/Bsymbolic/& -lgcj/' \
 		-e 's/ln -sfv/ln -sf/' Makefile*
-	autoreconf &&
+	./autogen.sh &&
 	{
 	./configure \
 		--prefix=/usr \
