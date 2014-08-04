@@ -1,0 +1,1350 @@
+Submitted By: DJ Lucas <dj AT linuxfromscratch DOT org>
+Date: 2011-01-25
+Initial Package Version: 1.9
+Upstream Status: comitted
+Origin: http://icedtea.classpath.org/hg/icedtea6/
+Description: Includes various fixes from upstream to allow a for a proper
+             bootstrap build. Rediffed for 1.9.4.
+
+diff -Naur icedtea6-1.9.4-orig//acinclude.m4 icedtea6-1.9.4//acinclude.m4
+--- icedtea6-1.9.4-orig//acinclude.m4	2010-12-01 13:07:29.000000000 -0600
++++ icedtea6-1.9.4//acinclude.m4	2011-01-22 21:33:07.000000000 -0600
+@@ -131,42 +131,46 @@
+ 
+ AC_DEFUN([FIND_JAVAC],
+ [
+-  user_specified_javac=
++  JAVAC=${SYSTEM_JDK_DIR}/bin/javac
++  IT_FIND_JAVAC
++  IT_FIND_ECJ
+ 
+-  CLASSPATH_WITH_ECJ
+-  CLASSPATH_WITH_JAVAC
+-
+-  if test "x${ECJ}" = x && test "x${JAVAC}" = x && test "x${user_specified_javac}" != xecj; then
+-      AC_MSG_ERROR([cannot find javac, try --with-ecj])
++  if test "x${JAVAC}" = x; then
++      AC_MSG_ERROR([cannot find a Java compiler, try --with-javac or --with-ecj])
+   fi
++  AC_SUBST(JAVAC)
+ ])
+ 
+-AC_DEFUN([CLASSPATH_WITH_ECJ],
++AC_DEFUN([IT_FIND_ECJ],
+ [
+   AC_ARG_WITH([ecj],
+ 	      [AS_HELP_STRING(--with-ecj,bytecode compilation with ecj)],
+   [
+     if test "x${withval}" != x && test "x${withval}" != xyes && test "x${withval}" != xno; then
+-      CLASSPATH_CHECK_ECJ(${withval})
++      IT_CHECK_ECJ(${withval})
+     else
+       if test "x${withval}" != xno; then
+-        CLASSPATH_CHECK_ECJ
++        IT_CHECK_ECJ
+       fi
+     fi
+-    user_specified_javac=ecj
+   ],
+   [ 
+-    CLASSPATH_CHECK_ECJ
++    IT_CHECK_ECJ
+   ])
+-  JAVAC="${ECJ} -nowarn"
+-  AC_SUBST(JAVAC)
++  if test "x${JAVAC}" = "x"; then
++    if test "x{ECJ}" != "x"; then
++      JAVAC="${ECJ} -nowarn"
++    fi
++  fi
+ ])
+ 
+-AC_DEFUN([CLASSPATH_CHECK_ECJ],
++AC_DEFUN([IT_CHECK_ECJ],
+ [
+   if test "x$1" != x; then
+     if test -f "$1"; then
++      AC_MSG_CHECKING(for ecj)
+       ECJ="$1"
++      AC_MSG_RESULT(${ECJ})
+     else
+       AC_PATH_PROG(ECJ, "$1")
+     fi
+@@ -184,31 +188,31 @@
+   fi
+ ])
+ 
+-AC_DEFUN([CLASSPATH_WITH_JAVAC],
++AC_DEFUN([IT_FIND_JAVAC],
+ [
+   AC_ARG_WITH([javac],
+ 	      [AS_HELP_STRING(--with-javac,bytecode compilation with javac)],
+   [
+     if test "x${withval}" != x && test "x${withval}" != xyes && test "x${withval}" != xno; then
+-      CLASSPATH_CHECK_JAVAC(${withval})
++      IT_CHECK_JAVAC(${withval})
+     else
+       if test "x${withval}" != xno; then
+-        CLASSPATH_CHECK_JAVAC
++        IT_CHECK_JAVAC
+       fi
+     fi
+-    user_specified_javac=javac
+   ],
+   [ 
+-    CLASSPATH_CHECK_JAVAC
++    IT_CHECK_JAVAC
+   ])
+-  AC_SUBST(JAVAC)
+ ])
+ 
+-AC_DEFUN([CLASSPATH_CHECK_JAVAC],
++AC_DEFUN([IT_CHECK_JAVAC],
+ [
+   if test "x$1" != x; then
+     if test -f "$1"; then
++      AC_MSG_CHECKING(for javac)
+       JAVAC="$1"
++      AC_MSG_RESULT(${JAVAC})
+     else
+       AC_PATH_PROG(JAVAC, "$1")
+     fi
+@@ -219,20 +223,18 @@
+ 
+ AC_DEFUN([FIND_JAVA],
+ [
++  AC_MSG_CHECKING(for java)
+   AC_ARG_WITH([java],
+               [AS_HELP_STRING(--with-java,specify location of the 1.5 java vm)],
+   [
+-    if test -f "${withval}"; then
+-      AC_MSG_CHECKING(java)
+-      JAVA="${withval}"
+-      AC_MSG_RESULT(${withval})
+-    else
+-      AC_PATH_PROG(JAVA, "${withval}")
+-    fi
++    JAVA="${withval}"
+   ],
+   [
+-    JAVA=
++    JAVA=${SYSTEM_JDK_DIR}/bin/java
+   ])
++  if ! test -f "${JAVA}"; then
++    AC_PATH_PROG(JAVA, "${JAVA}")
++  fi
+   if test -z "${JAVA}"; then
+     AC_PATH_PROG(JAVA, "gij")
+   fi
+@@ -242,6 +244,7 @@
+   if test -z "${JAVA}"; then
+     AC_MSG_ERROR("A 1.5-compatible Java VM is required.")
+   fi
++  AC_MSG_RESULT(${JAVA})
+   AC_SUBST(JAVA)
+ ])
+ 
+@@ -358,26 +361,17 @@
+ 
+ AC_DEFUN([FIND_JAVAH],
+ [
+-  AC_MSG_CHECKING([if a javah executable is specified])
++  AC_MSG_CHECKING([for javah])
+   AC_ARG_WITH([javah],
+-              [AS_HELP_STRING(--with-javah,specify location of javah)],
++              [AS_HELP_STRING(--with-javah,specify location of the Java header generator)],
+   [
+-    if test "x${withval}" = "xyes"; then
+-      JAVAH=no
+-    else
+-      JAVAH="${withval}"
+-    fi
++    JAVAH="${withval}"
+   ],
+   [
+-    JAVAH=no
++    JAVAH=${SYSTEM_JDK_DIR}/bin/javah
+   ])
+-  AC_MSG_RESULT(${JAVAH})
+   if ! test -f "${JAVAH}"; then
+-    if test "x${JAVAH}" = "xno"; then
+-      JAVAH=
+-    else
+-      AC_PATH_PROG(JAVAH, "${JAVAH}")
+-    fi
++    AC_PATH_PROG(JAVAH, "${JAVAH}")
+   fi
+   if test -z "${JAVAH}"; then
+     AC_PATH_PROG(JAVAH, "gjavah")
+@@ -388,31 +382,23 @@
+   if test -z "${JAVAH}"; then
+     AC_MSG_ERROR("A Java header generator was not found.")
+   fi
++  AC_MSG_RESULT(${JAVAH})
+   AC_SUBST(JAVAH)
+ ])
+ 
+ AC_DEFUN([FIND_JAR],
+ [
+-  AC_MSG_CHECKING([if a jar executable is specified])
++  AC_MSG_CHECKING([for jar])
+   AC_ARG_WITH([jar],
+-              [AS_HELP_STRING(--with-jar,specify location of jar)],
++              [AS_HELP_STRING(--with-jar,specify location of Java archive tool (jar))],
+   [
+-    if test "x${withval}" = "xyes"; then
+-      JAR=no
+-    else
+-      JAR="${withval}"
+-    fi
++    JAR="${withval}"
+   ],
+   [
+-    JAR=no
++    JAR=${SYSTEM_JDK_DIR}/bin/jar
+   ])
+-  AC_MSG_RESULT(${JAR})
+   if ! test -f "${JAR}"; then
+-    if test "x${JAR}" = "xno"; then
+-      JAR=
+-    else
+-      AC_PATH_PROG(JAR, "${JAR}")
+-    fi
++    AC_PATH_PROG(JAR, "${JAR}")
+   fi
+   if test -z "${JAR}"; then
+     AC_PATH_PROG(JAR, "gjar")
+@@ -421,8 +407,9 @@
+     AC_PATH_PROG(JAR, "jar")
+   fi
+   if test -z "${JAR}"; then
+-    AC_MSG_ERROR("A jar tool was not found.")
++    AC_MSG_ERROR("No Java archive tool was found.")
+   fi
++  AC_MSG_RESULT(${JAR})
+   AC_MSG_CHECKING([whether jar supports @<file> argument])
+   touch _config.txt
+   cat >_config.list <<EOF
+@@ -461,26 +448,17 @@
+ 
+ AC_DEFUN([FIND_RMIC],
+ [
+-  AC_MSG_CHECKING(if an rmic executable is specified)
++  AC_MSG_CHECKING(for rmic)
+   AC_ARG_WITH([rmic],
+-              [AS_HELP_STRING(--with-rmic,specify location of rmic)],
++              [AS_HELP_STRING(--with-rmic,specify location of the RMI compiler)],
+   [
+-    if test "x${withval}" = "xyes"; then
+-      RMIC=no
+-    else
+-      RMIC="${withval}"
+-    fi
++    RMIC="${withval}"
+   ],
+   [
+-    RMIC=no
++    RMIC=${SYSTEM_JDK_DIR}/bin/rmic
+   ])
+-  AC_MSG_RESULT(${RMIC})
+   if ! test -f "${RMIC}"; then
+-    if test "x${RMIC}" = "xno"; then
+-      RMIC=
+-    else
+-      AC_PATH_PROG(RMIC, "${RMIC}")
+-    fi
++    AC_PATH_PROG(RMIC, "${RMIC}")
+   fi
+   if test -z "${RMIC}"; then
+     AC_PATH_PROG(RMIC, "grmic")
+@@ -491,6 +469,7 @@
+   if test -z "${RMIC}"; then
+     AC_MSG_ERROR("An RMI compiler was not found.")
+   fi
++  AC_MSG_RESULT(${RMIC})
+   AC_SUBST(RMIC)
+ ])
+ 
+@@ -1066,86 +1045,67 @@
+   AM_CONDITIONAL(WITH_HGREV, test "x${HGREV}" != "x")
+ ])
+ 
+-AC_DEFUN([AC_CHECK_FOR_GCJ_JDK],
++AC_DEFUN([IT_CHECK_IF_BOOTSTRAPPING],
+ [
+-  AC_MSG_CHECKING([for a GCJ JDK home directory])
+-  AC_ARG_WITH([gcj-home],
+-	      [AS_HELP_STRING([--with-gcj-home],
+-                              [gcj home directory \
+-                               (default is /usr/lib/jvm/java-gcj or /usr/lib/jvm/gcj-jdk)])],
+-              [
++  AC_MSG_CHECKING([whether to build a bootstrap version first])
++  AC_ARG_ENABLE([bootstrap],
++                [AS_HELP_STRING(--disable-bootstrap, don't build a bootstrap version [[default=no]])],
++  [
++    case "${enableval}" in
++      no)
++       enable_bootstrap=no
++        ;;
++      *)
++        enable_bootstrap=yes
++        ;;
++    esac
++  ],
++  [
++        enable_bootstrap=yes
++  ])
++  AC_MSG_RESULT([${enable_bootstrap}])
++  AM_CONDITIONAL([BOOTSTRAPPING], test x"${enable_bootstrap}" = "xyes")
++])
++
++AC_DEFUN([IT_CHECK_FOR_JDK],
++[
++  AC_MSG_CHECKING([for a JDK home directory])
++  AC_ARG_WITH([jdk-home],
++             [AS_HELP_STRING([--with-jdk-home],
++                              [jdk home directory \
++                               (default is first predefined JDK found)])],
++             [
+                 if test "x${withval}" = xyes
+                 then
+-                  SYSTEM_GCJ_DIR=
++                  SYSTEM_JDK_DIR=
+                 elif test "x${withval}" = xno
+                 then
+-	          SYSTEM_GCJ_DIR=
++	          SYSTEM_JDK_DIR=
+ 	        else
+-                  SYSTEM_GCJ_DIR=${withval}
++                  SYSTEM_JDK_DIR=${withval}
+                 fi
+               ],
+               [
+-	        SYSTEM_GCJ_DIR=
++	        SYSTEM_JDK_DIR=
+               ])
+-  if test -z "${SYSTEM_GCJ_DIR}"; then
+-    for dir in /usr/lib/jvm/java-gcj /usr/lib/jvm/gcj-jdk /usr/lib/jvm/cacao ; do
++  if test -z "${SYSTEM_JDK_DIR}"; then
++    if test "x${enable_bootstrap}" = "xyes"; then
++      BOOTSTRAP_VMS="/usr/lib/jvm/java-gcj /usr/lib/jvm/gcj-jdk /usr/lib/jvm/cacao";
++    fi
++    for dir in ${BOOTSTRAP_VMS} /usr/lib/jvm/java-openjdk \
++              /usr/lib/jvm/icedtea6 /usr/lib/jvm/java-6-openjdk \
++              /usr/lib/jvm/openjdk /usr/lib/jvm/java-icedtea ; do
+        if test -d $dir; then
+-         SYSTEM_GCJ_DIR=$dir
++         SYSTEM_JDK_DIR=$dir
+ 	 break
+        fi
+     done
+   fi
+-  AC_MSG_RESULT(${SYSTEM_GCJ_DIR})
+-  if ! test -d "${SYSTEM_GCJ_DIR}"; then
+-    AC_MSG_ERROR("A GCJ JDK home directory could not be found.")
+-  fi
+-  AC_SUBST(SYSTEM_GCJ_DIR)
+-])
+-
+-dnl This option allows the initial build to be skipped, and a single build
+-dnl to be completed using an existing OpenJDK installation.  It can be used
+-dnl in three ways:
+-dnl   * --with-openjdk: look for OpenJDK in one of a series of predefined dirs
+-dnl   * --without-openjdk (default): do a full bootstrap, no OpenJDK required
+-dnl   * --with-openjdk=${path}: use the OpenJDK installed in the specified location
+-AC_DEFUN([AC_CHECK_FOR_OPENJDK],
+-[
+-  AC_MSG_CHECKING([for an existing OpenJDK installation])
+-  AC_ARG_WITH([openjdk],
+-              [AS_HELP_STRING([--with-openjdk[=DIR]],
+-                              [perform a quick build with an installed copy of OpenJDK])],
+-              [
+-                if test "x${withval}" = xno
+-                then
+-	          SYSTEM_OPENJDK_DIR=no
+-		  with_openjdk=false
+-	        else
+-                  SYSTEM_OPENJDK_DIR=${withval}
+-		  with_openjdk=true
+-                fi
+-              ],
+-              [
+-                SYSTEM_OPENJDK_DIR=no
+-		with_openjdk=false
+-              ])
+-  if test "x${SYSTEM_OPENJDK_DIR}" = xyes; then
+-    for dir in /usr/lib/jvm/java-openjdk /usr/lib/jvm/openjdk \
+-    	       /usr/lib/jvm/icedtea6 /usr/lib/jvm/java-6-openjdk \
+-	       /usr/lib/jvm/java-icedtea ; do
+-       if test -d $dir; then
+-         SYSTEM_OPENJDK_DIR=$dir
+-	 break
+-       fi
+-    done
+-  elif ! test x"${SYSTEM_OPENJDK_DIR}" = xno; then
+-    if ! test -d "${SYSTEM_OPENJDK_DIR}"; then
+-      AC_MSG_ERROR("An OpenJDK home directory could not be found.")
+-    fi
++  AC_MSG_RESULT(${SYSTEM_JDK_DIR})
++  if ! test -d "${SYSTEM_JDK_DIR}"; then
++    AC_MSG_ERROR("A JDK home directory could not be found.")
+   fi
+-  AM_CONDITIONAL(WITH_OPENJDK, test "x${SYSTEM_OPENJDK_DIR}" != xno)
+-  AC_MSG_RESULT(${SYSTEM_OPENJDK_DIR})
+-  AC_SUBST(SYSTEM_OPENJDK_DIR)
+-  AC_SUBST(with_openjdk)
++  AC_SUBST(SYSTEM_JDK_DIR)
+ ])
+ 
+ AC_DEFUN([AC_CHECK_WITH_TZDATA_DIR],
+@@ -1572,3 +1532,62 @@
+ AC_MSG_RESULT(${enable_netx})
+ AM_CONDITIONAL(ENABLE_NETX, test "x${enable_netx}" = "xyes")
+ ])
++
++AC_DEFUN([IT_JAVAH],[
++AC_CACHE_CHECK([if $JAVAH exhibits Classpath bug 39408], it_cv_cp39408_javah, [
++SUPERCLASS=Test.java
++SUBCLASS=TestImpl.java
++SUB=$(echo $SUBCLASS|sed 's#\.java##')
++SUBHEADER=$(echo $SUBCLASS|sed 's#\.java#.h#')
++mkdir tmp.$$
++cd tmp.$$
++cat << \EOF > $SUPERCLASS
++/* [#]line __oline__ "configure" */
++public class Test 
++{
++  public static final int POTATO = 0;
++  public static final int CABBAGE = 1;
++}
++EOF
++cat << \EOF > $SUBCLASS
++/* [#]line __oline__ "configure" */
++public class TestImpl
++  extends Test
++{
++  public native void doStuff();
++}
++EOF
++if $JAVAC -cp . $JAVACFLAGS $SUBCLASS >&AS_MESSAGE_LOG_FD 2>&1; then
++  if $JAVAH -classpath . $SUB >&AS_MESSAGE_LOG_FD 2>&1; then
++    if cat $SUBHEADER | grep POTATO >&AS_MESSAGE_LOG_FD 2>&1; then
++      it_cv_cp39408_javah=no;
++    else
++      it_cv_cp39408_javah=yes;
++    fi
++  else
++    AC_MSG_ERROR([The Java header generator $JAVAH failed])
++    echo "configure: failed program was:" >&AC_FD_CC
++    cat $SUBCLASS >&AC_FD_CC
++  fi
++else
++  AC_MSG_ERROR([The Java compiler $JAVAC failed])
++  echo "configure: failed program was:" >&AC_FD_CC
++  cat $SUBCLASS >&AC_FD_CC
++fi
++])
++AC_CACHE_CHECK([if $JAVAH exhibits Classpath bug 40188], it_cv_cp40188_javah, [
++  if test -e $SUBHEADER ; then
++    if cat $SUBHEADER | grep TestImpl_POTATO >&AS_MESSAGE_LOG_FD 2>&1; then
++      it_cv_cp40188_javah=no;
++    else
++      it_cv_cp40188_javah=yes;
++    fi
++  fi
++])
++rm -f $SUBCLASS $SUPERCLASS $SUBHEADER *.class
++cd ..
++rmdir tmp.$$
++AM_CONDITIONAL([CP39408_JAVAH], test x"${it_cv_cp39408_javah}" = "xyes")
++AM_CONDITIONAL([CP40188_JAVAH], test x"${it_cv_cp40188_javah}" = "xyes")
++AC_PROVIDE([$0])dnl
++])
+diff -Naur icedtea6-1.9.4-orig//aclocal.m4 icedtea6-1.9.4//aclocal.m4
+--- icedtea6-1.9.4-orig//aclocal.m4	2010-12-16 19:43:28.000000000 -0600
++++ icedtea6-1.9.4//aclocal.m4	2011-01-22 21:33:07.000000000 -0600
+@@ -20,7 +20,6 @@
+ To do so, use the procedure documented by the package, typically `autoreconf'.])])
+ 
+ # pkg.m4 - Macros to locate and utilise pkg-config.            -*- Autoconf -*-
+-# serial 1 (pkg-config-0.24)
+ # 
+ # Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
+ #
+@@ -48,10 +47,7 @@
+ AC_DEFUN([PKG_PROG_PKG_CONFIG],
+ [m4_pattern_forbid([^_?PKG_[A-Z_]+$])
+ m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
+-AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
+-AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
+-AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
+-
++AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])dnl
+ if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
+ 	AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+ fi
+@@ -64,6 +60,7 @@
+ 		AC_MSG_RESULT([no])
+ 		PKG_CONFIG=""
+ 	fi
++		
+ fi[]dnl
+ ])# PKG_PROG_PKG_CONFIG
+ 
+@@ -72,20 +69,21 @@
+ # Check to see whether a particular set of modules exists.  Similar
+ # to PKG_CHECK_MODULES(), but does not set variables or print errors.
+ #
+-# Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
+-# only at the first occurence in configure.ac, so if the first place
+-# it's called might be skipped (such as if it is within an "if", you
+-# have to call PKG_CHECK_EXISTS manually
++#
++# Similar to PKG_CHECK_MODULES, make sure that the first instance of
++# this or PKG_CHECK_MODULES is called, or make sure to call
++# PKG_CHECK_EXISTS manually
+ # --------------------------------------------------------------
+ AC_DEFUN([PKG_CHECK_EXISTS],
+ [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+ if test -n "$PKG_CONFIG" && \
+     AC_RUN_LOG([$PKG_CONFIG --exists --print-errors "$1"]); then
+-  m4_default([$2], [:])
++  m4_ifval([$2], [$2], [:])
+ m4_ifvaln([$3], [else
+   $3])dnl
+ fi])
+ 
++
+ # _PKG_CONFIG([VARIABLE], [COMMAND], [MODULES])
+ # ---------------------------------------------
+ m4_define([_PKG_CONFIG],
+@@ -138,7 +136,6 @@
+ See the pkg-config man page for more details.])
+ 
+ if test $pkg_failed = yes; then
+-   	AC_MSG_RESULT([no])
+         _PKG_SHORT_ERRORS_SUPPORTED
+         if test $_pkg_short_errors_supported = yes; then
+ 	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
+@@ -148,7 +145,7 @@
+ 	# Put the nasty error message in config.log where it belongs
+ 	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
+ 
+-	m4_default([$4], [AC_MSG_ERROR(
++	ifelse([$4], , [AC_MSG_ERROR(dnl
+ [Package requirements ($2) were not met:
+ 
+ $$1_PKG_ERRORS
+@@ -156,24 +153,25 @@
+ Consider adjusting the PKG_CONFIG_PATH environment variable if you
+ installed software in a non-standard prefix.
+ 
+-_PKG_TEXT])[]dnl
+-        ])
++_PKG_TEXT
++])],
++		[AC_MSG_RESULT([no])
++                $4])
+ elif test $pkg_failed = untried; then
+-     	AC_MSG_RESULT([no])
+-	m4_default([$4], [AC_MSG_FAILURE(
++	ifelse([$4], , [AC_MSG_FAILURE(dnl
+ [The pkg-config script could not be found or is too old.  Make sure it
+ is in your PATH or set the PKG_CONFIG environment variable to the full
+ path to pkg-config.
+ 
+ _PKG_TEXT
+ 
+-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])dnl
+-        ])
++To get pkg-config, see <http://pkg-config.freedesktop.org/>.])],
++		[$4])
+ else
+ 	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
+ 	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
+         AC_MSG_RESULT([yes])
+-	$3
++	ifelse([$3], , :, [$3])
+ fi[]dnl
+ ])# PKG_CHECK_MODULES
+ 
+diff -Naur icedtea6-1.9.4-orig//ChangeLog icedtea6-1.9.4//ChangeLog
+--- icedtea6-1.9.4-orig//ChangeLog	2010-12-17 05:24:31.000000000 -0600
++++ icedtea6-1.9.4//ChangeLog	2011-01-22 21:33:07.000000000 -0600
+@@ -613,11 +613,87 @@
+ 	* netx/net/sourceforge/jnlp/JNLPSplashScreen.java
+ 	(setSplashImageURL): Check for possible null.
+ 
++2010-08-24  Andrew John Hughes  <ahughes@redhat.com>
++
++	* Makefile.am: Compile NimbusLookAndFeel as a
++	bootstrap class so the older version from
++	IcedTea6 1.8 is not used when bootstrapping
++	with it.
++
+ 2010-08-23  Andrew Su  <asu@redhat.com>
+ 
+ 	* plugin/icedteanp/java/sun/applet/PluginAppletViewer.java
+ 	    (parse): Removed parsing for unknown <app> tag.
+ 
++2010-08-13  Andrew John Hughes  <ahughes@redhat.com>
++
++	* patches/ecj/javah.patch: Moved to...
++	* Makefile.am: Apply patch to OpenGL headers
++	only if javah exhibits Classpath bug 40188.
++	http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40188
++	* patches/ecj/cp40188-opengl.patch: here.
++
++2010-08-13  Andrew John Hughes  <ahughes@redhat.com>
++
++	* acinclude.m4:
++	(IT_JAVAH): Renamed from IT_CP39408_JAVAH.
++	Add test for PR40188.
++	* configure.ac:
++	Make full bootstrap the default again.  Rename
++	IT_CP39408_JAVAH to IT_JAVAH.
++
++2010-08-13  Andrew John Hughes  <ahughes@redhat.com>
++
++	* acinclude.m4:
++	(IT_CP39408_JAVAH): Add classpath specification
++	to JAVAC invocation to handle buggy ecjs.
++
++2010-08-13  Andrew John Hughes  <ahughes@redhat.com>
++
++	* acinclude.m4:
++	(IT_CP39408_JAVAH): New test for Classpath
++	bug 39408.
++	* configure.ac: Enable new test.  Result
++	as yet unused.
++
++2010-08-13  Andrew John Hughes  <ahughes@redhat.com>
++
++	* Makefile.am:
++	Replace conditionals on LACKS_SUN_AWT_TOOLKIT
++	with ones on BOOTSTRAPPING.  If we are bootstrapping,
++	we don't trust the system JDK and update rt.jar
++	with newly built classes, regardless of whether it's
++	an Oracle-based JDK or not.
++	* configure.ac:
++	Remove check for sun.awt.Toolkit.
++
++2010-08-10  Andrew John Hughes  <ahughes@redhat.com>
++
++	* Makefile.am:
++	Remove use of WITH_OPENJDK and SYSTEM_GCJ_DIR
++	replacing with BOOTSTRAPPING and SYSTEM_JDK_DIR
++	as appropriate.
++	* acinclude.m4:
++	(FIND_JAVAC): Search for generic 'javac' first.
++	(IT_FIND_ECJ): Only use ecj as javac if JAVA is unset.
++	(IT_CHECK_ECJ): Add configure output.
++	(IT_FIND_JAVAC): Likewise.
++	(IT_CHECK_JAVAC): Likewise.
++	(FIND_JAVA): Try java in SYSTEM_JDK_DIR before searching.
++	(FIND_JAVAH): Likewise for javah.
++	(FIND_JAR): Likewise for jar.
++	(FIND_RMIC): Likewise for rmic.
++	(IT_CHECK_IF_BOOTSTRAPPING): Allow bootstrapping to be disabled.
++	Makes explicit the side-effect of --with-openjdk.
++	(IT_CHECK_FOR_JDK): Find JDK to use.  Replaces --with-gcj-jdk,
++	and --with-openjdk.  At present, only checks for gcj jdks if
++	not bootstrapping.
++	(AC_CHECK_FOR_OPENJDK): Removed.
++	(AC_CHECK_FOR_GCJ_JDK): Removed.
++	* configure.ac:
++	Remove --with-openjdk.  Always check for a JDK and then allow
++	individual binaries to be overridden by --with-x.
++
+ 2010-08-09  Deepak Bhole <dbhole@redhat.com>
+ 
+ 	* Makefile.am:
+diff -Naur icedtea6-1.9.4-orig//configure.ac icedtea6-1.9.4//configure.ac
+--- icedtea6-1.9.4-orig//configure.ac	2010-12-16 19:02:53.000000000 -0600
++++ icedtea6-1.9.4//configure.ac	2011-01-22 21:33:07.000000000 -0600
+@@ -48,7 +48,6 @@
+ AC_CHECK_WITH_HOTSPOT_BUILD
+ AC_PATH_TOOL([LINUX32],[linux32])
+ AC_CHECK_GCC_VERSION
+-AC_CHECK_FOR_OPENJDK
+ IT_CHECK_NUMBER_OF_PARALLEL_JOBS
+ IT_CP_SUPPORTS_REFLINK
+ IT_CAN_HARDLINK_TO_SOURCE_TREE
+@@ -144,32 +143,21 @@
+ OPENJDK_BUILD_DIR=openjdk.build
+ AC_SUBST(OPENJDK_BUILD_DIR)
+ 
+-if test "${with_openjdk}" = true
+-then
+-  JAVA=$SYSTEM_OPENJDK_DIR/bin/java
+-  AC_SUBST(JAVA)
+-  JAVAC=${SYSTEM_OPENJDK_DIR}/bin/javac
+-  AC_SUBST(JAVAC)
+-  JAVAH=${SYSTEM_OPENJDK_DIR}/bin/javah
+-  AC_SUBST(JAVAH)
+-  JAR=${SYSTEM_OPENJDK_DIR}/bin/jar
+-  AC_SUBST(JAR)
+-  RMIC=${SYSTEM_OPENJDK_DIR}/bin/rmic
+-  AC_SUBST(RMIC)
+-else
+-  AC_CHECK_FOR_GCJ_JDK
+-  FIND_JAVA
+-  FIND_JAVAC
+-  FIND_JAVAH
+-  FIND_JAR
+-  FIND_RMIC
++IT_CHECK_IF_BOOTSTRAPPING
++IT_CHECK_FOR_JDK
++FIND_JAVA
++FIND_JAVAC
++FIND_JAVAH
++FIND_JAR
++FIND_RMIC
++if test "x$enable_bootstrap" = "xyes"; then
+   FIND_ECJ_JAR
+   FIND_XALAN2_JAR
+   FIND_XALAN2_SERIALIZER_JAR
+   FIND_XERCES2_JAR
+-  AC_CONFIG_FILES([javac], [chmod +x javac])
+-  AC_CONFIG_FILES([javap], [chmod +x javap])
+ fi
++AC_CONFIG_FILES([javac], [chmod +x javac])
++AC_CONFIG_FILES([javap], [chmod +x javap])
+ 
+ FIND_RHINO_JAR
+ WITH_OPENJDK_SRC_ZIP
+@@ -190,9 +178,9 @@
+ ENABLE_HG
+ AC_CHECK_WITH_HG_REVISION
+ AC_CHECK_WITH_TZDATA_DIR
+-IT_CHECK_FOR_CLASS([SUN_AWT_TOOLKIT], [sun.awt.SunToolkit])
+ IT_GETDTDTYPE_CHECK
+ IT_CHECK_XULRUNNER_VERSION
++IT_JAVAH
+ 
+ dnl pkgconfig cannot be used to find these headers and libraries.
+ AC_CHECK_HEADERS([cups/cups.h cups/ppd.h],[]
+diff -Naur icedtea6-1.9.4-orig//Makefile.am icedtea6-1.9.4//Makefile.am
+--- icedtea6-1.9.4-orig//Makefile.am	2010-12-16 13:16:41.000000000 -0600
++++ icedtea6-1.9.4//Makefile.am	2011-01-22 21:33:07.000000000 -0600
+@@ -92,6 +92,7 @@
+ ICEDTEA_BOOTSTRAP_CLASSES = \
+ 	$(SHARE)/javax/swing/plaf/basic/BasicDirectoryModel.java \
+ 	$(SHARE)/javax/management/StandardMBean.java \
++	$(SHARE)/com/sun/java/swing/plaf/nimbus/NimbusLookAndFeel.java \
+ 	$(NETX_BOOTSTRAP_CLASSES)
+ 
+ # Flags
+@@ -139,10 +140,10 @@
+ # FIXME: This should not depend on bootstrapping
+ # but on whether MEMORY_LIMIT is accepted
+ # as an argument to javac
+-if WITH_OPENJDK
+-  MEMORY_LIMIT = -J-Xmx1024m
+-else
++if BOOTSTRAPPING
+   MEMORY_LIMIT =
++else
++  MEMORY_LIMIT = -J-Xmx1024m
+ endif
+ 
+ if WITH_CACAO
+@@ -152,17 +153,14 @@
+   ICEDTEA_DEBUG_BUILD_TARGET = debug_build
+ endif
+ 
+-# FIXME (bootstrap): Assumption is WITH_OPENJDK == no bootstrap
+-if WITH_OPENJDK
+-  BOOTSTRAP_DIRECTORY_STAMP =
+-  SYSTEM_JDK_DIR = $(SYSTEM_OPENJDK_DIR)
+-  ICEDTEA_HOME = $(SYSTEM_JDK_DIR)
+-  INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink.stamp
+-else
++if BOOTSTRAPPING
+   BOOTSTRAP_DIRECTORY_STAMP = stamps/bootstrap-directory.stamp
+-  SYSTEM_JDK_DIR = $(SYSTEM_GCJ_DIR)
+   ICEDTEA_HOME = $(ICEDTEA_BOOT_DIR)
+   INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink-ecj.stamp
++else
++  BOOTSTRAP_DIRECTORY_STAMP =
++  ICEDTEA_HOME = $(SYSTEM_JDK_DIR)
++  INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink.stamp
+ endif
+ 
+ if CP_SUPPORTS_REFLINK
+@@ -422,9 +420,10 @@
+ endif
+ 
+ if ENABLE_XRENDER
+-ICEDTEA_ECJ_PATCHES += \
+-	patches/ecj/needs-6.patch \
+-	patches/ecj/javah.patch
++ICEDTEA_ECJ_PATCHES += patches/ecj/needs-6.patch
++if CP40188_JAVAH
++ICEDTEA_ECJ_PATCHES += patches/ecj/cp40188-opengl.patch
++endif
+ endif
+ 
+ if !HAS_PAX
+@@ -547,6 +546,8 @@
+ 	BOOTCLASSPATH_CLS_RT="-bootclasspath $(ICEDTEA_CLS_DIR_ECJ):$(RUNTIME)" \
+ 	BOOTCLASSPATH_CLS="-bootclasspath $(ICEDTEA_CLS_DIR_ECJ)" \
+ 	BOOTCLASSPATH_RT_LIBGCJ="-bootclasspath $(RUNTIME)" \
++	CLASSPATH="" \
++	LD_LIBRARY_PATH="" \
+ 	GENSRCDIR="$(abs_top_builddir)/generated" \
+ 	JAR_KNOWS_ATFILE="$(JAR_KNOWS_ATFILE)" \
+ 	JAR_KNOWS_J_OPTIONS="$(JAR_KNOWS_J_OPTIONS)" \
+@@ -1566,29 +1567,20 @@
+ # Rebuild targets
+ 
+ rebuild:
+-if WITH_OPENJDK
+-	rm -f stamps/icedtea.stamp
+-	rm -f stamps/icedtea-against-icedtea.stamp
+-	$(ARCH_PREFIX) $(MAKE) icedtea-against-icedtea
+-	@echo "IcedTea is served (again):" $(BUILD_OUTPUT_DIR)/j2sdk-image
+-else
++if BOOTSTRAPPING
+ 	rm -f stamps/icedtea-ecj.stamp
+ 	rm -f stamps/icedtea-against-ecj.stamp
+ 	$(ARCH_PREFIX) $(MAKE) icedtea-against-ecj
+ 	@echo "ecj-poured IcedTea is served (again):" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++else
++	rm -f stamps/icedtea.stamp
++	rm -f stamps/icedtea-against-icedtea.stamp
++	$(ARCH_PREFIX) $(MAKE) icedtea-against-icedtea
++	@echo "IcedTea is served (again):" $(BUILD_OUTPUT_DIR)/j2sdk-image
+ endif
+ 
+ hotspot:
+-if WITH_OPENJDK
+-	rm -f stamps/icedtea.stamp
+-	rm -f stamps/icedtea-against-icedtea.stamp
+-	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-icedtea
+-	mkdir -p \
+-	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-	cp $(BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
+-	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-	@echo "Hotspot is served:" $(BUILD_OUTPUT_DIR)/j2sdk-image
+-else
++if BOOTSTRAPPING
+ 	rm -f stamps/icedtea-ecj.stamp
+ 	rm -f stamps/icedtea-against-ecj.stamp
+ 	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-ecj
+@@ -1597,6 +1589,15 @@
+ 	cp $(ECJ_BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
+ 	   $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+ 	@echo "Hotspot is served:" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++else
++	rm -f stamps/icedtea.stamp
++	rm -f stamps/icedtea-against-icedtea.stamp
++	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-icedtea
++	mkdir -p \
++	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++	cp $(BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
++	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++	@echo "Hotspot is served:" $(BUILD_OUTPUT_DIR)/j2sdk-image
+ endif
+ 
+ stamps/icedtea-against-ecj.stamp: \
+@@ -1956,7 +1957,7 @@
+ # configure script arguments, quoted in single quotes
+ CONFIGURE_ARGS = @CONFIGURE_ARGS@
+ ADD_ZERO_CONFIGURE_ARGS = \
+-	--with-openjdk=$(BUILD_OUTPUT_DIR)/j2sdk-image \
++	--with-jdk-home=$(BUILD_OUTPUT_DIR)/j2sdk-image \
+ 	--enable-zero
+ if ADD_SHARK_BUILD
+ ADD_ZERO_CONFIGURE_ARGS += \
+@@ -2183,7 +2184,7 @@
+ 	done
+ 
+ stamps/rt-class-files.stamp: $(INITIAL_BOOTSTRAP_LINK_STAMP) rt-source-files.txt
+-if LACKS_SUN_AWT_TOOLKIT
++if BOOTSTRAPPING
+ 	mkdir -p lib/rt
+ 	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d lib/rt \
+           -sourcepath $(SOURCEPATH_DIRS) -bootclasspath \'\' \
+@@ -2198,7 +2199,7 @@
+ 	rm -f stamps/rt-class-files.stamp
+ 	rm -f stamps/rt.stamp
+ 	rm -f rt-source-files.txt
+-if LACKS_SUN_AWT_TOOLKIT
++if BOOTSTRAPPING
+ 	if [ -e $(ECJ_BOOT_DIR) ] ; then \
+ 	  cp $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(ECJ_BOOT_DIR)/jre/lib/rt.jar ; \
+ 	fi
+@@ -2206,7 +2207,7 @@
+ 
+ stamps/rt.stamp: stamps/rt-class-files.stamp
+ 	mkdir -p stamps
+-if LACKS_SUN_AWT_TOOLKIT
++if BOOTSTRAPPING
+ 	$(BOOT_DIR)/bin/jar uf $(RUNTIME) -C lib/rt com -C lib/rt java \
+ 	  -C lib/rt javax -C lib/rt sun 
+ if ENABLE_NIO2
+diff -Naur icedtea6-1.9.4-orig//Makefile.in icedtea6-1.9.4//Makefile.in
+--- icedtea6-1.9.4-orig//Makefile.in	2010-12-16 19:43:31.000000000 -0600
++++ icedtea6-1.9.4//Makefile.in	2011-01-22 21:33:07.000000000 -0600
+@@ -88,38 +88,37 @@
+ @DTDTYPE_QNAME_TRUE@am__append_15 = \
+ @DTDTYPE_QNAME_TRUE@	patches/ecj/icedtea-jaxws-getdtdtype.patch
+ 
+-@ENABLE_XRENDER_TRUE@am__append_16 = \
+-@ENABLE_XRENDER_TRUE@	patches/ecj/needs-6.patch \
+-@ENABLE_XRENDER_TRUE@	patches/ecj/javah.patch
++@ENABLE_XRENDER_TRUE@am__append_16 = patches/ecj/needs-6.patch
++@CP40188_JAVAH_TRUE@@ENABLE_XRENDER_TRUE@am__append_17 = patches/ecj/cp40188-opengl.patch
+ 
+-@HAS_PAX_FALSE@am__append_17 = patches/ecj/no-test_gamma.patch
+-@WITH_CACAO_TRUE@am__append_18 = \
++@HAS_PAX_FALSE@am__append_18 = patches/ecj/no-test_gamma.patch
++@WITH_CACAO_TRUE@am__append_19 = \
+ @WITH_CACAO_TRUE@	ALT_HOTSPOT_IMPORT_PATH="$(CACAO_IMPORT_PATH)"
+ 
+-@DISABLE_OPTIMIZATIONS_TRUE@am__append_19 = \
++@DISABLE_OPTIMIZATIONS_TRUE@am__append_20 = \
+ @DISABLE_OPTIMIZATIONS_TRUE@	NO_OPTIMIZATIONS="true" \
+ @DISABLE_OPTIMIZATIONS_TRUE@	CC_NO_OPT="-O0 -g"
+ 
+-@ENABLE_DOCS_FALSE@am__append_20 = \
++@ENABLE_DOCS_FALSE@am__append_21 = \
+ @ENABLE_DOCS_FALSE@	NO_DOCS="true"
+ 
+-@ENABLE_CROSS_COMPILATION_TRUE@am__append_21 = \
++@ENABLE_CROSS_COMPILATION_TRUE@am__append_22 = \
+ @ENABLE_CROSS_COMPILATION_TRUE@	CROSS_COMPILATION="true" \
+ @ENABLE_CROSS_COMPILATION_TRUE@	CROSS_TARGET_ARCH="$(CROSS_TARGET_ARCH)"
+ 
+-@USE_ALT_JAR_TRUE@am__append_22 = \
++@USE_ALT_JAR_TRUE@am__append_23 = \
+ @USE_ALT_JAR_TRUE@	ALT_JAR_CMD="$(ALT_JAR_CMD)"
+ 
+-@HAS_HOTSPOT_REVISION_TRUE@am__append_23 = \
++@HAS_HOTSPOT_REVISION_TRUE@am__append_24 = \
+ @HAS_HOTSPOT_REVISION_TRUE@	HOTSPOT_BUILD_VERSION="$(HOTSPOT_REVISION)" 
+ 
+-@WITH_RHINO_TRUE@am__append_24 = \
++@WITH_RHINO_TRUE@am__append_25 = \
+ @WITH_RHINO_TRUE@	RHINO_JAR="$(abs_top_builddir)/rhino/rhino.jar"
+ 
+-@ADD_SHARK_BUILD_TRUE@am__append_25 = \
++@ADD_SHARK_BUILD_TRUE@am__append_26 = \
+ @ADD_SHARK_BUILD_TRUE@	--enable-shark
+ 
+-@WITH_ALT_HSBUILD_TRUE@am__append_26 = \
++@WITH_ALT_HSBUILD_TRUE@am__append_27 = \
+ @WITH_ALT_HSBUILD_TRUE@	$(if $(findstring --with-hotspot-src-zip=, $(CONFIGURE_ARGS)),, \
+ @WITH_ALT_HSBUILD_TRUE@	  --with-hotspot-src-zip=$(abs_top_builddir)/$(HOTSPOT_SRC_ZIP))
+ 
+@@ -285,8 +284,6 @@
+ PATH_SEPARATOR = @PATH_SEPARATOR@
+ PKGVERSION = @PKGVERSION@
+ PKG_CONFIG = @PKG_CONFIG@
+-PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+-PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+ RHINO_JAR = @RHINO_JAR@
+ RMIC = @RMIC@
+ SET_MAKE = @SET_MAKE@
+@@ -294,8 +291,7 @@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ SYSTEM_ANT_DIR = @SYSTEM_ANT_DIR@
+-SYSTEM_GCJ_DIR = @SYSTEM_GCJ_DIR@
+-SYSTEM_OPENJDK_DIR = @SYSTEM_OPENJDK_DIR@
++SYSTEM_JDK_DIR = @SYSTEM_JDK_DIR@
+ TAR = @TAR@
+ TZDATA_DIR = @TZDATA_DIR@
+ UNZIP = @UNZIP@
+@@ -376,7 +372,6 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-with_openjdk = @with_openjdk@
+ OPENJDK_DATE = 21_jun_2010
+ OPENJDK_MD5SUM = 0b36adbf67e4f261e1b827ed4be4f447
+ OPENJDK_VERSION = b20
+@@ -463,6 +458,7 @@
+ ICEDTEA_BOOTSTRAP_CLASSES = \
+ 	$(SHARE)/javax/swing/plaf/basic/BasicDirectoryModel.java \
+ 	$(SHARE)/javax/management/StandardMBean.java \
++	$(SHARE)/com/sun/java/swing/plaf/nimbus/NimbusLookAndFeel.java \
+ 	$(NETX_BOOTSTRAP_CLASSES)
+ 
+ 
+@@ -500,25 +496,21 @@
+ @ENABLE_PULSE_JAVA_TRUE@PULSE_JAVA_CLASS_DIR = $(PULSE_JAVA_BUILDDIR)/classes
+ @ENABLE_PULSE_JAVA_TRUE@PULSE_JAVA_TARGET = stamps/pulse-java.stamp
+ @ENABLE_PULSE_JAVA_TRUE@PULSE_JAVA_CLEAN_TARGET = clean-pulse-java
+-@WITH_OPENJDK_FALSE@MEMORY_LIMIT = 
++@BOOTSTRAPPING_FALSE@MEMORY_LIMIT = -J-Xmx1024m
+ 
+ # FIXME: This should not depend on bootstrapping
+ # but on whether MEMORY_LIMIT is accepted
+ # as an argument to javac
+-@WITH_OPENJDK_TRUE@MEMORY_LIMIT = -J-Xmx1024m
++@BOOTSTRAPPING_TRUE@MEMORY_LIMIT = 
+ @WITH_CACAO_TRUE@ICEDTEA_BUILD_TARGET = jdk_only
+ @WITH_CACAO_FALSE@ICEDTEA_DEBUG_BUILD_TARGET = debug_build
+ @WITH_CACAO_TRUE@ICEDTEA_DEBUG_BUILD_TARGET = jdk_fastdebug_only
+-@WITH_OPENJDK_FALSE@BOOTSTRAP_DIRECTORY_STAMP = stamps/bootstrap-directory.stamp
+-
+-# FIXME (bootstrap): Assumption is WITH_OPENJDK == no bootstrap
+-@WITH_OPENJDK_TRUE@BOOTSTRAP_DIRECTORY_STAMP = 
+-@WITH_OPENJDK_FALSE@SYSTEM_JDK_DIR = $(SYSTEM_GCJ_DIR)
+-@WITH_OPENJDK_TRUE@SYSTEM_JDK_DIR = $(SYSTEM_OPENJDK_DIR)
+-@WITH_OPENJDK_FALSE@ICEDTEA_HOME = $(ICEDTEA_BOOT_DIR)
+-@WITH_OPENJDK_TRUE@ICEDTEA_HOME = $(SYSTEM_JDK_DIR)
+-@WITH_OPENJDK_FALSE@INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink-ecj.stamp
+-@WITH_OPENJDK_TRUE@INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink.stamp
++@BOOTSTRAPPING_FALSE@BOOTSTRAP_DIRECTORY_STAMP = 
++@BOOTSTRAPPING_TRUE@BOOTSTRAP_DIRECTORY_STAMP = stamps/bootstrap-directory.stamp
++@BOOTSTRAPPING_FALSE@ICEDTEA_HOME = $(SYSTEM_JDK_DIR)
++@BOOTSTRAPPING_TRUE@ICEDTEA_HOME = $(ICEDTEA_BOOT_DIR)
++@BOOTSTRAPPING_FALSE@INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink.stamp
++@BOOTSTRAPPING_TRUE@INITIAL_BOOTSTRAP_LINK_STAMP = stamps/bootstrap-directory-symlink-ecj.stamp
+ @CP_SUPPORTS_REFLINK_TRUE@REFLINK = --reflink=auto
+ @OPENJDK_SRC_DIR_HARDLINKABLE_FALSE@OPENJDK_SRC_DIR_LINK = $(REFLINK)
+ @OPENJDK_SRC_DIR_HARDLINKABLE_TRUE@OPENJDK_SRC_DIR_LINK = -l
+@@ -664,7 +656,7 @@
+ 	patches/ecj/icedtea-jaxp-dependency.patch \
+ 	patches/ecj/bootver.patch patches/ecj/getannotation-cast.patch \
+ 	patches/ecj/override.patch $(am__append_15) $(am__append_16) \
+-	$(am__append_17) $(DISTRIBUTION_ECJ_PATCHES)
++	$(am__append_17) $(am__append_18) $(DISTRIBUTION_ECJ_PATCHES)
+ @ZERO_BUILD_FALSE@ICEDTEA_ZERO_BUILD = 
+ 
+ # OpenJDK build environment.
+@@ -705,9 +697,9 @@
+ 	$(PACKAGE_VERSION)$(ICEDTEA_REV)" DEBUG_CLASSFILES="true" \
+ 	DEBUG_BINARIES="true" \
+ 	ALT_DROPS_DIR="$(abs_top_builddir)/drops" VERBOSE="$(VERBOSE)" \
+-	ALT_OUTPUTDIR="$(BUILD_OUTPUT_DIR)" $(am__append_18) \
+-	$(am__append_19) $(am__append_20) $(am__append_21) \
+-	$(am__append_22) $(am__append_23) $(am__append_24)
++	ALT_OUTPUTDIR="$(BUILD_OUTPUT_DIR)" $(am__append_19) \
++	$(am__append_20) $(am__append_21) $(am__append_22) \
++	$(am__append_23) $(am__append_24) $(am__append_25)
+ 
+ # OpenJDK ecj build environment.
+ ICEDTEA_ENV_ECJ = $(ICEDTEA_ENV) \
+@@ -718,6 +710,8 @@
+ 	BOOTCLASSPATH_CLS_RT="-bootclasspath $(ICEDTEA_CLS_DIR_ECJ):$(RUNTIME)" \
+ 	BOOTCLASSPATH_CLS="-bootclasspath $(ICEDTEA_CLS_DIR_ECJ)" \
+ 	BOOTCLASSPATH_RT_LIBGCJ="-bootclasspath $(RUNTIME)" \
++	CLASSPATH="" \
++	LD_LIBRARY_PATH="" \
+ 	GENSRCDIR="$(abs_top_builddir)/generated" \
+ 	JAR_KNOWS_ATFILE="$(JAR_KNOWS_ATFILE)" \
+ 	JAR_KNOWS_J_OPTIONS="$(JAR_KNOWS_J_OPTIONS)" \
+@@ -765,14 +759,14 @@
+ @ENABLE_PLUGIN_TRUE@		IcedTeaPluginUtils.o
+ 
+ ADD_ZERO_CONFIGURE_ARGS =  \
+-	--with-openjdk=$(BUILD_OUTPUT_DIR)/j2sdk-image --enable-zero \
+-	$(am__append_25) --disable-docs $(filter-out \
++	--with-jdk-home=$(BUILD_OUTPUT_DIR)/j2sdk-image --enable-zero \
++	$(am__append_26) --disable-docs $(filter-out \
+ 	'--with-gcj-home=% '--with-ecj=% '--with-java=% \
+ 	'--with-javah=% '--with-rmic=% '--with-additional-vms=% \
+ 	'--with-openjdk '--with-openjdk=% , $(CONFIGURE_ARGS)) $(if \
+ 	$(findstring --with-openjdk-src-zip=, $(CONFIGURE_ARGS)),, \
+ 	--with-openjdk-src-zip=$(abs_top_builddir)/$(OPENJDK_SRC_ZIP)) \
+-	$(am__append_26)
++	$(am__append_27)
+ ADD_ZERO_EXTRA_BUILD_ENV = \
+ 	BUILD_LANGTOOLS=false ALT_LANGTOOLS_DIST=$(BUILD_OUTPUT_DIR)/langtools/dist \
+ 	BUILD_JAXP=false      ALT_JAXP_DIST=$(BUILD_OUTPUT_DIR)/jaxp/dist \
+@@ -2014,32 +2008,32 @@
+ # Rebuild targets
+ 
+ rebuild:
+-@WITH_OPENJDK_TRUE@	rm -f stamps/icedtea.stamp
+-@WITH_OPENJDK_TRUE@	rm -f stamps/icedtea-against-icedtea.stamp
+-@WITH_OPENJDK_TRUE@	$(ARCH_PREFIX) $(MAKE) icedtea-against-icedtea
+-@WITH_OPENJDK_TRUE@	@echo "IcedTea is served (again):" $(BUILD_OUTPUT_DIR)/j2sdk-image
+-@WITH_OPENJDK_FALSE@	rm -f stamps/icedtea-ecj.stamp
+-@WITH_OPENJDK_FALSE@	rm -f stamps/icedtea-against-ecj.stamp
+-@WITH_OPENJDK_FALSE@	$(ARCH_PREFIX) $(MAKE) icedtea-against-ecj
+-@WITH_OPENJDK_FALSE@	@echo "ecj-poured IcedTea is served (again):" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++@BOOTSTRAPPING_TRUE@	rm -f stamps/icedtea-ecj.stamp
++@BOOTSTRAPPING_TRUE@	rm -f stamps/icedtea-against-ecj.stamp
++@BOOTSTRAPPING_TRUE@	$(ARCH_PREFIX) $(MAKE) icedtea-against-ecj
++@BOOTSTRAPPING_TRUE@	@echo "ecj-poured IcedTea is served (again):" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++@BOOTSTRAPPING_FALSE@	rm -f stamps/icedtea.stamp
++@BOOTSTRAPPING_FALSE@	rm -f stamps/icedtea-against-icedtea.stamp
++@BOOTSTRAPPING_FALSE@	$(ARCH_PREFIX) $(MAKE) icedtea-against-icedtea
++@BOOTSTRAPPING_FALSE@	@echo "IcedTea is served (again):" $(BUILD_OUTPUT_DIR)/j2sdk-image
+ 
+ hotspot:
+-@WITH_OPENJDK_TRUE@	rm -f stamps/icedtea.stamp
+-@WITH_OPENJDK_TRUE@	rm -f stamps/icedtea-against-icedtea.stamp
+-@WITH_OPENJDK_TRUE@	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-icedtea
+-@WITH_OPENJDK_TRUE@	mkdir -p \
+-@WITH_OPENJDK_TRUE@	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-@WITH_OPENJDK_TRUE@	cp $(BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
+-@WITH_OPENJDK_TRUE@	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-@WITH_OPENJDK_TRUE@	@echo "Hotspot is served:" $(BUILD_OUTPUT_DIR)/j2sdk-image
+-@WITH_OPENJDK_FALSE@	rm -f stamps/icedtea-ecj.stamp
+-@WITH_OPENJDK_FALSE@	rm -f stamps/icedtea-against-ecj.stamp
+-@WITH_OPENJDK_FALSE@	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-ecj
+-@WITH_OPENJDK_FALSE@	mkdir -p \
+-@WITH_OPENJDK_FALSE@	   $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-@WITH_OPENJDK_FALSE@	cp $(ECJ_BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
+-@WITH_OPENJDK_FALSE@	   $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
+-@WITH_OPENJDK_FALSE@	@echo "Hotspot is served:" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++@BOOTSTRAPPING_TRUE@	rm -f stamps/icedtea-ecj.stamp
++@BOOTSTRAPPING_TRUE@	rm -f stamps/icedtea-against-ecj.stamp
++@BOOTSTRAPPING_TRUE@	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-ecj
++@BOOTSTRAPPING_TRUE@	mkdir -p \
++@BOOTSTRAPPING_TRUE@	   $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++@BOOTSTRAPPING_TRUE@	cp $(ECJ_BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
++@BOOTSTRAPPING_TRUE@	   $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++@BOOTSTRAPPING_TRUE@	@echo "Hotspot is served:" $(ECJ_BUILD_OUTPUT_DIR)/j2sdk-image
++@BOOTSTRAPPING_FALSE@	rm -f stamps/icedtea.stamp
++@BOOTSTRAPPING_FALSE@	rm -f stamps/icedtea-against-icedtea.stamp
++@BOOTSTRAPPING_FALSE@	$(ARCH_PREFIX) $(MAKE) ICEDTEA_BUILD_TARGET=hotspot icedtea-against-icedtea
++@BOOTSTRAPPING_FALSE@	mkdir -p \
++@BOOTSTRAPPING_FALSE@	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++@BOOTSTRAPPING_FALSE@	cp $(BUILD_OUTPUT_DIR)/$(SERVER_DIR)/libjvm.so \
++@BOOTSTRAPPING_FALSE@	   $(BUILD_OUTPUT_DIR)/j2sdk-image/jre/lib/$(INSTALL_ARCH_DIR)/server
++@BOOTSTRAPPING_FALSE@	@echo "Hotspot is served:" $(BUILD_OUTPUT_DIR)/j2sdk-image
+ 
+ stamps/icedtea-against-ecj.stamp: \
+ 	stamps/bootstrap-directory-symlink-ecj.stamp \
+@@ -2531,11 +2525,11 @@
+ 	done
+ 
+ stamps/rt-class-files.stamp: $(INITIAL_BOOTSTRAP_LINK_STAMP) rt-source-files.txt
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	mkdir -p lib/rt
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d lib/rt \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@          -sourcepath $(SOURCEPATH_DIRS) -bootclasspath \'\' \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@          -classpath $(SYSTEM_JDK_DIR)/jre/lib/rt.jar \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	  @rt-source-files.txt ;
++@BOOTSTRAPPING_TRUE@	mkdir -p lib/rt
++@BOOTSTRAPPING_TRUE@	$(BOOT_DIR)/bin/javac $(IT_JAVACFLAGS) -d lib/rt \
++@BOOTSTRAPPING_TRUE@          -sourcepath $(SOURCEPATH_DIRS) -bootclasspath \'\' \
++@BOOTSTRAPPING_TRUE@          -classpath $(SYSTEM_JDK_DIR)/jre/lib/rt.jar \
++@BOOTSTRAPPING_TRUE@	  @rt-source-files.txt ;
+ 	mkdir -p stamps
+ 	touch stamps/rt-class-files.stamp
+ 
+@@ -2544,17 +2538,17 @@
+ 	rm -f stamps/rt-class-files.stamp
+ 	rm -f stamps/rt.stamp
+ 	rm -f rt-source-files.txt
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	if [ -e $(ECJ_BOOT_DIR) ] ; then \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	  cp $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(ECJ_BOOT_DIR)/jre/lib/rt.jar ; \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	fi
++@BOOTSTRAPPING_TRUE@	if [ -e $(ECJ_BOOT_DIR) ] ; then \
++@BOOTSTRAPPING_TRUE@	  cp $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(ECJ_BOOT_DIR)/jre/lib/rt.jar ; \
++@BOOTSTRAPPING_TRUE@	fi
+ 
+ stamps/rt.stamp: stamps/rt-class-files.stamp
+ 	mkdir -p stamps
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	$(BOOT_DIR)/bin/jar uf $(RUNTIME) -C lib/rt com -C lib/rt java \
+-@LACKS_SUN_AWT_TOOLKIT_TRUE@	  -C lib/rt javax -C lib/rt sun 
+-@ENABLE_NIO2_TRUE@@LACKS_SUN_AWT_TOOLKIT_TRUE@	if [ -e lib/rt/org/classpath ] ; then \
+-@ENABLE_NIO2_TRUE@@LACKS_SUN_AWT_TOOLKIT_TRUE@	    $(BOOT_DIR)/bin/jar uf $(RUNTIME) -C lib/rt org/classpath ; \
+-@ENABLE_NIO2_TRUE@@LACKS_SUN_AWT_TOOLKIT_TRUE@	fi
++@BOOTSTRAPPING_TRUE@	$(BOOT_DIR)/bin/jar uf $(RUNTIME) -C lib/rt com -C lib/rt java \
++@BOOTSTRAPPING_TRUE@	  -C lib/rt javax -C lib/rt sun 
++@BOOTSTRAPPING_TRUE@@ENABLE_NIO2_TRUE@	if [ -e lib/rt/org/classpath ] ; then \
++@BOOTSTRAPPING_TRUE@@ENABLE_NIO2_TRUE@	    $(BOOT_DIR)/bin/jar uf $(RUNTIME) -C lib/rt org/classpath ; \
++@BOOTSTRAPPING_TRUE@@ENABLE_NIO2_TRUE@	fi
+ 	touch stamps/rt.stamp
+ 
+ # Target Aliases
+diff -Naur icedtea6-1.9.4-orig//patches/ecj/cp40188-opengl.patch icedtea6-1.9.4//patches/ecj/cp40188-opengl.patch
+--- icedtea6-1.9.4-orig//patches/ecj/cp40188-opengl.patch	1969-12-31 18:00:00.000000000 -0600
++++ icedtea6-1.9.4//patches/ecj/cp40188-opengl.patch	2011-01-22 21:33:07.000000000 -0600
+@@ -0,0 +1,92 @@
++diff -Nru openjdk-boot.orig/jdk/make/common/Rules.gmk openjdk-boot/jdk/make/common/Rules.gmk
++--- openjdk-ecj.orig/jdk/make/common/Rules.gmk	2009-12-13 20:37:41.000000000 +0000
+++++ openjdk-ecj/jdk/make/common/Rules.gmk	2009-12-13 21:11:04.000000000 +0000
++@@ -303,7 +303,11 @@
++ 	$(prep-target)
++ 	@$(ECHO) "# Running javah:"
++ 	$(JAVAH_CMD) -d $(CLASSHDRDIR)/ \
++-		$(CLASSES.export) $(subst $$,\$$,$(EXPORTED_inner))
+++		$(CLASSES.export) 
+++	$(foreach innerclass,$(subst $$,\$$,$(EXPORTED_inner)), \
+++	  $(JAVAH_CMD) \
+++	    -o $(CLASSHDRDIR)/$(subst .,_,$(subst \$$,_,$(innerclass))).h \
+++	    $(innerclass))
++ 	@$(java-vm-cleanup)
++ 	@$(TOUCH) $@
++ 
++diff -Nru openjdk-boot.orig/jdk/make/sun/awt/FILES_export_unix.gmk openjdk-boot/jdk/make/sun/awt/FILES_export_unix.gmk
++--- openjdk-ecj.orig/jdk/make/sun/awt/FILES_export_unix.gmk	2009-12-04 23:26:35.000000000 +0000
+++++ openjdk-ecj/jdk/make/sun/awt/FILES_export_unix.gmk	2009-12-13 21:11:04.000000000 +0000
++@@ -189,3 +189,5 @@
++ 	java/awt/dnd/DnDConstants.java \
++ 	sun/awt/CausedFocusEvent.java
++ 
+++EXPORTED_inner = \
+++    sun.java2d.opengl.OGLContext$$OGLContextCaps
++diff -Nru openjdk-boot.orig/jdk/src/share/native/sun/java2d/opengl/OGLContext.h openjdk-boot/jdk/src/share/native/sun/java2d/opengl/OGLContext.h
++--- openjdk-ecj.orig/jdk/src/share/native/sun/java2d/opengl/OGLContext.h	2009-12-04 23:33:16.000000000 +0000
+++++ openjdk-ecj/jdk/src/share/native/sun/java2d/opengl/OGLContext.h	2009-12-13 21:11:04.000000000 +0000
++@@ -27,6 +27,7 @@
++ #define OGLContext_h_Included
++ 
++ #include "sun_java2d_pipe_BufferedContext.h"
+++#include "sun_java2d_pipe_hw_ContextCapabilities.h"
++ #include "sun_java2d_opengl_OGLContext.h"
++ #include "sun_java2d_opengl_OGLContext_OGLContextCaps.h"
++ 
++@@ -100,39 +101,39 @@
++  * See OGLContext.java for more on these flags.
++  */
++ #define CAPS_EMPTY           \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EMPTY
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_EMPTY
++ #define CAPS_RT_PLAIN_ALPHA  \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_PLAIN_ALPHA
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_PLAIN_ALPHA
++ #define CAPS_RT_TEXTURE_ALPHA       \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_TEXTURE_ALPHA
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_TEXTURE_ALPHA
++ #define CAPS_RT_TEXTURE_OPAQUE      \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_TEXTURE_OPAQUE
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_TEXTURE_OPAQUE
++ #define CAPS_MULTITEXTURE    \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_MULTITEXTURE
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_MULTITEXTURE
++ #define CAPS_TEXNONPOW2      \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_TEXNONPOW2
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_TEXNONPOW2
++ #define CAPS_TEXNONSQUARE    \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_TEXNONSQUARE
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_TEXNONSQUARE
++ #define CAPS_PS20            \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_PS20
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_PS20
++ #define CAPS_PS30            \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_PS30
+++    sun_java2d_pipe_hw_ContextCapabilities_CAPS_PS30
++ #define LAST_SHARED_CAP      \
++     sun_java2d_opengl_OGLContext_OGLContextCaps_LAST_SHARED_CAP
++ #define CAPS_EXT_FBOBJECT    \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_FBOBJECT
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_FBOBJECT
++ #define CAPS_STORED_ALPHA    \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_STORED_ALPHA
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_STORED_ALPHA
++ #define CAPS_DOUBLEBUFFERED  \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_DOUBLEBUFFERED
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_DOUBLEBUFFERED
++ #define CAPS_EXT_LCD_SHADER  \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_LCD_SHADER
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_LCD_SHADER
++ #define CAPS_EXT_BIOP_SHADER \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_BIOP_SHADER
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_BIOP_SHADER
++ #define CAPS_EXT_GRAD_SHADER \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_GRAD_SHADER
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_GRAD_SHADER
++ #define CAPS_EXT_TEXRECT     \
++-    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_TEXRECT
+++    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_TEXRECT
++ 
++ /**
++  * Evaluates to true if the given capability bitmask is present for the
+diff -Naur icedtea6-1.9.4-orig//patches/ecj/javah.patch icedtea6-1.9.4//patches/ecj/javah.patch
+--- icedtea6-1.9.4-orig//patches/ecj/javah.patch	2010-12-01 13:08:11.000000000 -0600
++++ icedtea6-1.9.4//patches/ecj/javah.patch	1969-12-31 18:00:00.000000000 -0600
+@@ -1,92 +0,0 @@
+-diff -Nru openjdk-boot.orig/jdk/make/common/Rules.gmk openjdk-boot/jdk/make/common/Rules.gmk
+---- openjdk-ecj.orig/jdk/make/common/Rules.gmk	2009-12-13 20:37:41.000000000 +0000
+-+++ openjdk-ecj/jdk/make/common/Rules.gmk	2009-12-13 21:11:04.000000000 +0000
+-@@ -303,7 +303,11 @@
+- 	$(prep-target)
+- 	@$(ECHO) "# Running javah:"
+- 	$(JAVAH_CMD) -d $(CLASSHDRDIR)/ \
+--		$(CLASSES.export) $(subst $$,\$$,$(EXPORTED_inner))
+-+		$(CLASSES.export) 
+-+	$(foreach innerclass,$(subst $$,\$$,$(EXPORTED_inner)), \
+-+	  $(JAVAH_CMD) \
+-+	    -o $(CLASSHDRDIR)/$(subst .,_,$(subst \$$,_,$(innerclass))).h \
+-+	    $(innerclass))
+- 	@$(java-vm-cleanup)
+- 	@$(TOUCH) $@
+- 
+-diff -Nru openjdk-boot.orig/jdk/make/sun/awt/FILES_export_unix.gmk openjdk-boot/jdk/make/sun/awt/FILES_export_unix.gmk
+---- openjdk-ecj.orig/jdk/make/sun/awt/FILES_export_unix.gmk	2009-12-04 23:26:35.000000000 +0000
+-+++ openjdk-ecj/jdk/make/sun/awt/FILES_export_unix.gmk	2009-12-13 21:11:04.000000000 +0000
+-@@ -189,3 +189,5 @@
+- 	java/awt/dnd/DnDConstants.java \
+- 	sun/awt/CausedFocusEvent.java
+- 
+-+EXPORTED_inner = \
+-+    sun.java2d.opengl.OGLContext$$OGLContextCaps
+-diff -Nru openjdk-boot.orig/jdk/src/share/native/sun/java2d/opengl/OGLContext.h openjdk-boot/jdk/src/share/native/sun/java2d/opengl/OGLContext.h
+---- openjdk-ecj.orig/jdk/src/share/native/sun/java2d/opengl/OGLContext.h	2009-12-04 23:33:16.000000000 +0000
+-+++ openjdk-ecj/jdk/src/share/native/sun/java2d/opengl/OGLContext.h	2009-12-13 21:11:04.000000000 +0000
+-@@ -27,6 +27,7 @@
+- #define OGLContext_h_Included
+- 
+- #include "sun_java2d_pipe_BufferedContext.h"
+-+#include "sun_java2d_pipe_hw_ContextCapabilities.h"
+- #include "sun_java2d_opengl_OGLContext.h"
+- #include "sun_java2d_opengl_OGLContext_OGLContextCaps.h"
+- 
+-@@ -100,39 +101,39 @@
+-  * See OGLContext.java for more on these flags.
+-  */
+- #define CAPS_EMPTY           \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EMPTY
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_EMPTY
+- #define CAPS_RT_PLAIN_ALPHA  \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_PLAIN_ALPHA
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_PLAIN_ALPHA
+- #define CAPS_RT_TEXTURE_ALPHA       \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_TEXTURE_ALPHA
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_TEXTURE_ALPHA
+- #define CAPS_RT_TEXTURE_OPAQUE      \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_RT_TEXTURE_OPAQUE
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_RT_TEXTURE_OPAQUE
+- #define CAPS_MULTITEXTURE    \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_MULTITEXTURE
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_MULTITEXTURE
+- #define CAPS_TEXNONPOW2      \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_TEXNONPOW2
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_TEXNONPOW2
+- #define CAPS_TEXNONSQUARE    \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_TEXNONSQUARE
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_TEXNONSQUARE
+- #define CAPS_PS20            \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_PS20
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_PS20
+- #define CAPS_PS30            \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_PS30
+-+    sun_java2d_pipe_hw_ContextCapabilities_CAPS_PS30
+- #define LAST_SHARED_CAP      \
+-     sun_java2d_opengl_OGLContext_OGLContextCaps_LAST_SHARED_CAP
+- #define CAPS_EXT_FBOBJECT    \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_FBOBJECT
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_FBOBJECT
+- #define CAPS_STORED_ALPHA    \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_STORED_ALPHA
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_STORED_ALPHA
+- #define CAPS_DOUBLEBUFFERED  \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_DOUBLEBUFFERED
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_DOUBLEBUFFERED
+- #define CAPS_EXT_LCD_SHADER  \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_LCD_SHADER
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_LCD_SHADER
+- #define CAPS_EXT_BIOP_SHADER \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_BIOP_SHADER
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_BIOP_SHADER
+- #define CAPS_EXT_GRAD_SHADER \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_GRAD_SHADER
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_GRAD_SHADER
+- #define CAPS_EXT_TEXRECT     \
+--    sun_java2d_opengl_OGLContext_OGLContextCaps_CAPS_EXT_TEXRECT
+-+    sun_java2d_opengl_OGLContext_00024OGLContextCaps_CAPS_EXT_TEXRECT
+- 
+- /**
+-  * Evaluates to true if the given capability bitmask is present for the

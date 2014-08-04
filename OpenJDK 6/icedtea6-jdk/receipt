@@ -40,6 +40,12 @@ compile_rules()
 
 	local JVM_PREFIX
 	JVM_PREFIX="/usr/lib/jvm/java-icedtea"
+
+	# Apply patches
+	patch -Np1 -i ../../stuff/icedtea6-1.9.7-fixed_paths-1.patch
+	patch -Np1 -i ../../stuff/icedtea6-1.9.7-upstream_fixes-1.patch
+	patch -Np1 -i ../../stuff/icedtea6-1.9.7-xerces2_10-1.patch
+	#patch -Np1 -i ../../stuff/icedtea6-1.9.7-generate_cacerts-1.patch
 	
 	# NOTE: This build does not seem to work with ECJ 3.5
 	local ECJ_VERSION

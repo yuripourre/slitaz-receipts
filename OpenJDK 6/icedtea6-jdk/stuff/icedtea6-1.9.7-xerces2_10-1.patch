@@ -1,0 +1,140 @@
+Submitted By: DJ Lucas <dj AT linuxfromscratch DOT org>
+Date: 2011-01-25
+Initial Package Version: 1.9.4
+Upstream Status: submitted
+Origin: self
+Description: Allows the build to generate a working bootstrap jdk when using
+             a system Xerces-J-2.10.0 or newer. Rediffed for 1.9.4.
+
+diff -Nuar icedtea6-1.9.4-orig//acinclude.m4 icedtea6-1.9.4//acinclude.m4
+--- icedtea6-1.9.4-orig//acinclude.m4	2011-01-22 21:36:04.000000000 -0600
++++ icedtea6-1.9.4//acinclude.m4	2011-01-22 21:36:24.000000000 -0600
+@@ -562,7 +562,7 @@
+ [
+   AC_MSG_CHECKING(for endorsed jars dir)
+   AC_ARG_WITH([endorsed-dir],
+-              [AS_HELP_STRING(--with-endorsed-dir,specify directory of endorsed jars (xalan-j2.jar, xalan-j2-serializer.jar, xerces-j2.jar))],
++              [AS_HELP_STRING(--with-endorsed-dir,specify directory of endorsed jars (xalan-j2.jar, xalan-j2-serializer.jar, xerces-j2.jar, xml-apis.jar))],
+   [
+     if test "x${withval}" = "xno"; then
+         ENDORSED_JARS="${withval}"
+@@ -570,6 +570,7 @@
+     else if test -f "${withval}/xalan-j2.jar"; then
+       if test -f "${withval}/xalan-j2-serializer.jar"; then
+         if test -f "${withval}/xerces-j2.jar"; then
++          if test -f "${withval}/xml-apis.jar"; then
+           ENDORSED_JARS="${withval}"
+           AC_MSG_RESULT(${withval})
+         fi
+@@ -583,7 +584,8 @@
+     if test -f "/usr/share/java/xalan-j2.jar"; then
+       if test -f "/usr/share/java/xalan-j2-serializer.jar"; then
+         if test -f "/usr/share/java/xerces-j2.jar"; then
+-          ENDORSED_JARS="/usr/share/java/xalan-j2.jar /usr/share/java/xalan-j2-serializer.jar /usr/share/java/xerces-j2.jar"
++          if test -f "/usr/share/java/xml-apis.jar"; then
++          ENDORSED_JARS="/usr/share/java/xalan-j2.jar /usr/share/java/xalan-j2-serializer.jar /usr/share/java/xerces-j2.jar /usr/share/java/xml-apis.jar"
+           AC_MSG_RESULT(/usr/share/java)
+         fi
+       fi
+@@ -593,7 +595,7 @@
+     fi
+   fi
+   if test -z "${ENDORSED_JARS}"; then
+-    AC_MSG_ERROR("A directory containing required jars (xalan-j2.jar, xalan-j2-serializer.jar, xerces-j2.jar) was not found.")
++    AC_MSG_ERROR("A directory containing required jars (xalan-j2.jar, xalan-j2-serializer.jar, xerces-j2.jar, xml-apis.jar) was not found.")
+   fi
+   AC_SUBST(ENDORSED_JARS)
+ ])
+@@ -727,6 +729,33 @@
+   AC_SUBST(XERCES2_JAR)
+ ])
+ 
++AC_DEFUN([FIND_XML_APIS_JAR],
++[
++  AC_MSG_CHECKING([for a xerces2 xml-apis jar])
++  AC_ARG_WITH([xml-apis-jar],
++              [AS_HELP_STRING(--with-xml-apis-jar,specify location of the xerces2 xml-apis jar)],
++  [
++    if test -f "${withval}" ; then
++      XML_APIS_JAR="${withval}"
++    fi
++  ],
++  [
++    XML_APIS_JAR=
++  ])
++  if test -z "${XML_APIS_JAR}"; then
++    if test -e "/usr/share/java/xml-apis.jar"; then
++      XML_APIS_JAR=/usr/share/java/xml-apis.jar
++    else
++      AC_MSG_RESULT(no)
++    fi
++  fi
++  if test -z "${XML_APIS_JAR}"; then
++    AC_MSG_ERROR("A xerces2 xml-apis jar was not found.")
++  fi
++  AC_MSG_RESULT(${XML_APIS_JAR})
++  AC_SUBST(XML_APIS_JAR)
++])
++
+ AC_DEFUN([FIND_RHINO_JAR],
+ [
+   AC_MSG_CHECKING([whether to include Javascript support via Rhino])
+diff -Nuar icedtea6-1.9.4-orig//configure.ac icedtea6-1.9.4//configure.ac
+--- icedtea6-1.9.4-orig//configure.ac	2011-01-22 21:36:04.000000000 -0600
++++ icedtea6-1.9.4//configure.ac	2011-01-22 21:36:24.000000000 -0600
+@@ -162,6 +162,7 @@
+   FIND_XALAN2_JAR
+   FIND_XALAN2_SERIALIZER_JAR
+   FIND_XERCES2_JAR
++  FIND_XML_APIS_JAR
+ fi
+ AC_CONFIG_FILES([javac], [chmod +x javac])
+ AC_CONFIG_FILES([javap], [chmod +x javap])
+diff -Nuar icedtea6-1.9.4-orig//Makefile.am icedtea6-1.9.4//Makefile.am
+--- icedtea6-1.9.4-orig//Makefile.am	2011-01-22 21:36:04.000000000 -0600
++++ icedtea6-1.9.4//Makefile.am	2011-01-22 21:36:24.000000000 -0600
+@@ -1217,7 +1217,11 @@
+ 	ln -sf $(XALAN2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xalan-j2.jar && \
+ 	ln -sf $(XALAN2_SERIALIZER_JAR) \
+ 	  $(ECJ_BOOT_DIR)/lib/endorsed/xalan-j2-serializer.jar && \
+-	ln -sf $(XERCES2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xerces-j2.jar
++	ln -sf $(XERCES2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xerces-j2.jar && \
++	if test -f "$(XML_APIS_JAR)"; then \
++	    ln -sf $(XML_APIS_JAR) \
++	           $(ECJ_BOOT_DIR)/lib/endorsed/xml-apis.jar; \
++	fi
+ 	mkdir -p $(ECJ_BOOT_DIR)/jre/lib && \
+ 	cp $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(ECJ_BOOT_DIR)/jre/lib/rt.jar && \
+ 	ln -sf $(SYSTEM_JDK_DIR)/jre/lib/$(JRE_ARCH_DIR) \
+diff -Nuar icedtea6-1.9.4-orig//Makefile.in icedtea6-1.9.4//Makefile.in
+--- icedtea6-1.9.4-orig//Makefile.in	2011-01-22 21:36:04.000000000 -0600
++++ icedtea6-1.9.4//Makefile.in	2011-01-22 21:36:24.000000000 -0600
+@@ -90,7 +90,6 @@
+ 
+ @ENABLE_XRENDER_TRUE@am__append_16 = patches/ecj/needs-6.patch
+ @CP40188_JAVAH_TRUE@@ENABLE_XRENDER_TRUE@am__append_17 = patches/ecj/cp40188-opengl.patch
+-
+ @HAS_PAX_FALSE@am__append_18 = patches/ecj/no-test_gamma.patch
+ @WITH_CACAO_TRUE@am__append_19 = \
+ @WITH_CACAO_TRUE@	ALT_HOTSPOT_IMPORT_PATH="$(CACAO_IMPORT_PATH)"
+@@ -307,6 +306,7 @@
+ XERCES2_JAR = @XERCES2_JAR@
+ XINERAMA_CFLAGS = @XINERAMA_CFLAGS@
+ XINERAMA_LIBS = @XINERAMA_LIBS@
++XML_APIS_JAR = @XML_APIS_JAR@
+ XPROTO_CFLAGS = @XPROTO_CFLAGS@
+ XPROTO_LIBS = @XPROTO_LIBS@
+ XP_CFLAGS = @XP_CFLAGS@
+@@ -1692,7 +1692,11 @@
+ 	ln -sf $(XALAN2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xalan-j2.jar && \
+ 	ln -sf $(XALAN2_SERIALIZER_JAR) \
+ 	  $(ECJ_BOOT_DIR)/lib/endorsed/xalan-j2-serializer.jar && \
+-	ln -sf $(XERCES2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xerces-j2.jar
++	ln -sf $(XERCES2_JAR) $(ECJ_BOOT_DIR)/lib/endorsed/xerces-j2.jar && \
++	if test -f "$(XML_APIS_JAR)"; then \
++	    ln -sf $(XML_APIS_JAR) \
++	           $(ECJ_BOOT_DIR)/lib/endorsed/xml-apis.jar; \
++	fi
+ 	mkdir -p $(ECJ_BOOT_DIR)/jre/lib && \
+ 	cp $(SYSTEM_JDK_DIR)/jre/lib/rt.jar $(ECJ_BOOT_DIR)/jre/lib/rt.jar && \
+ 	ln -sf $(SYSTEM_JDK_DIR)/jre/lib/$(JRE_ARCH_DIR) \
