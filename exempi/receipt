@@ -2,7 +2,7 @@
 
 PACKAGE="exempi"
 VERSION="2.2.1"
-CATEGORY="libdevel"
+CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="An implementation of XMP (Adobe's Extensible Metadata Platform)."
 MAINTAINER="yuripourre@gmail.com"
@@ -11,7 +11,7 @@ WEB_SITE="http://libopenraw.freedesktop.org/wiki/Exempi/"
 WGET_URL="http://libopenraw.freedesktop.org/download/$TARBALL"
 
 DEPENDS=""
-BUILD_DEPENDS="libboost-dev"
+BUILD_DEPENDS="expat libboost-dev libboost-test-dev"
 
 # Rules to configure and make the package.
 compile_rules()
