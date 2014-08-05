@@ -10,10 +10,10 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
-DEPENDS="gtk+ dconf util-linux-uuid vte mate-desktop"
-BUILD_DEPENDS="wget dconf-dev gtk+-dev util-linux-uuid-dev vte-dev \
-mate-common mate-desktop yelp-tools autoconf automake libtool itstool \
-harfbuzz-dev"
+DEPENDS="gtk+ dconf"
+BUILD_DEPENDS="wget dconf-dev gtk+-dev autoconf automake libtool itstool \
+mate-common-dev mate-desktop-dev mate-menus-dev yelp-tools dbus-glib-dev \ 
+gobject-introspection-dev gtk-doc libcanberra-dev libwnck-dev librsvg-dev"
 
 # Rules to configure and make the package.
 compile_rules()
