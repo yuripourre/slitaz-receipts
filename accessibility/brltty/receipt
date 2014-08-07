@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="brltty"
-VERSION="5.1"
+VERSION="4.1"
 CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Open-source braille translator and back-translator."
@@ -10,16 +10,20 @@ TARBALL="$PACKAGE-$VERSION.tar.xz"
 WEB_SITE="http://mielke.cc/brltty/"
 WGET_URL="http://mielke.cc/brltty/archive/$TARBALL"
 
-DEPENDS="gpm icu"
-BUILD_DEPENDS="python-cython gpm-dev tcl"
-SUGGESTED="at-spi2 at-spi-atk bluez"
+DEPENDS="xorg-libXaw gpm icu tcl python-cython"
+BUILD_DEPENDS="python-pyrex gpm-dev gawk bison"
+SUGGESTED="at-spi2 at-spi-atk bluez espeak"
 
 # Rules to configure and make the package.
 compile_rules()
 {
-	./configure                    \
-		--prefix=/usr          \
-		--disable-static       \
+	./configure                      \
+		--prefix=/usr            \
+		--sysconfdir=/etc        \
+		--localstatedir=/var     \
+		--enable-gpm             \
+		--disable-java-bindings  \
+		--disable-caml-bindings  \
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
