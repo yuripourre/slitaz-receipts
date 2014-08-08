@@ -36,7 +36,7 @@ genpkg_rules()
 	cp -a $install/usr/bin $fs/usr
 	cp -a $install/usr/share $fs/usr
 	cp -a $install/usr/lib/*.so* $fs/usr/lib
-	cp -a $install/usr/libexec/* $fs/usr/lib/caja
+	cp -a $install/usr/libexec/* $fs/usr/lib/caja/*
 
 	cp -a $install/usr/share/caja $fs/usr/share
 	cp -a $install/usr/share/dbus-1 $fs/usr/share
