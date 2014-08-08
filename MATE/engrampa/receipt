@@ -31,8 +31,12 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr
-	cp -a $install/usr $fs
+	mkdir -p $fs/usr/share/pixmaps
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/lib $fs/usr
+	cp -a $install/usr/share/$PACKAGE $fs/usr/share
+	cp -a $install/usr/share/icons/hicolor/32x32/apps/*.png \
+		$fs/usr/share/pixmaps
 }
 
 # Post install/remove commands for Tazpkg.
