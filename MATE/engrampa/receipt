@@ -1,20 +1,19 @@
 # SliTaz package receipt.
 
-PACKAGE="caja"
+PACKAGE="engrampa"
 VERSION="1.9.0"
 CATEGORY="utilities"
 LICENSE="GPL3"
-SHORT_DESC="MATE file manager."
+SHORT_DESC="MATE archive manipulator."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
-DEPENDS="gtk+ mate-desktop dconf exempi gvfs libunique"
+DEPENDS="bzip2 caja desktop-file-utils gtk+ gzip libarchive tar"
 BUILD_DEPENDS="wget dbus-dev dconf-dev cacerts autoconf automake libtool itstool \
-gtk+-dev gtk-doc mate-common-dev mate-desktop-dev mate-icon-theme libunique-dev \
-gvfs-dev desktop-file-utils gobject-introspection-dev util-linux-uuid-dev"
-SUGGESTED="gvfs-smb"
+gtk+-dev gtk-doc mate-common-dev mate-desktop-dev yelp-tools"
+SUGGESTED="unrar unace p7zip yelp zip"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -22,10 +21,9 @@ compile_rules()
 	./autogen.sh                           \
 		--prefix=/usr                  \
 		--libexecdir=/usr/lib/$PACKAGE \
-		--enable-introspection         \
-		--enable-unique                \
+		--with-gtk=2.0                 \
 		--disable-static               \
-		--disable-update-mimedb        \
+		--disable-packagekit           \
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
@@ -33,15 +31,8 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/lib/caja $fs/usr/share/pixmaps
-	cp -a $install/usr/bin $fs/usr
-	cp -a $install/usr/lib/*.so* $fs/usr/lib
-	cp -a $install/usr/lib/caja $fs/usr/lib
-	cp -a $install/usr/share/caja $fs/usr/share
-	cp -a $install/usr/share/dbus-1 $fs/usr/share
-	cp -a $install/usr/share/glib-2.0 $fs/usr/share
-	cp -a $install/usr/share/icons/hicolor/32x32/apps/*.png \
-		$fs/usr/share/pixmaps
+	mkdir -p $fs/usr
+	cp -a $install/usr $fs
 }
 
 # Post install/remove commands for Tazpkg.
