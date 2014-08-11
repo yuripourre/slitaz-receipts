@@ -1,0 +1,29 @@
+# SliTaz package receipt.
+
+PACKAGE="gnome-hearts"
+VERSION="0.3.1"
+CATEGORY="games"
+LICENSE="GPL3"
+SHORT_DESC="GNOME hearts card game."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WEB_SITE="http://www.jejik.com/gnome-hearts/"
+WGET_URL="http://www.jejik.com/files/gnome-hearts/$TARBALL"
+
+DEPENDS="gtk+3 glib libglade python"
+BUILD_DEPENDS="gtk+3-dev glib-dev itstool"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	cp -a $install/usr $fs
+}
