@@ -12,7 +12,7 @@ WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
 DEPENDS="gtk+ polkit"
 BUILD_DEPENDS="wget cacerts autoconf automake libtool itstool \
-gtk+-dev gtk-doc gobject-introspection mate-common-dev"
+gtk+-dev gtk-doc polkit-dev gobject-introspection-dev mate-common-dev"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -21,7 +21,7 @@ compile_rules()
 		--prefix=/usr                  \
 		--libexecdir=/usr/lib/$PACKAGE \
 		--sysconfdir=/etc              \
-		--localstatedit=/var           \
+		--localstatedir=/var           \
 		--with-gtk=2.0                 \
 		--enable-introspection         \
 		--disable-static               \
@@ -32,6 +32,8 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/
-	cp -a $install/usr $fs
+	mkdir -p $fs/usr/lib
+	cp -a $install/etc $fs
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+	cp -a $install/usr/lib/$PACKAGE $fs/usr/lib/$PACKAGE
 }
