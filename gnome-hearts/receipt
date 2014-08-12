@@ -10,14 +10,15 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.jejik.com/gnome-hearts/"
 WGET_URL="http://www.jejik.com/files/gnome-hearts/$TARBALL"
 
-DEPENDS="gtk+3 glib libglade python"
-BUILD_DEPENDS="gtk+3-dev glib-dev itstool"
+DEPENDS="gtk+ libglade python libgnomeui libgnome-keyring"
+BUILD_DEPENDS="gtk+-dev libglade-dev python-dev libgnome-dev \
+libgnomeui-dev glib-dev itstool scrollkeeper-dev"
 
 # Rules to configure and make the package.
 compile_rules()
 {
-	./configure \
-		--prefix=/usr \
+	./configure  \
+		--disable-scrollkeeper \
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
@@ -25,5 +26,9 @@ compile_rules()
 
 genpkg_rules()
 {
-	cp -a $install/usr $fs
+	mkdir -p $fs/usr/bin $fs/usr/share
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/share/pixmaps $fs/usr/share
+	cp -a $install/usr/share/$PACKAGE $fs/usr/share
+	cp -a $install/usr/share/applications $fs/usr/share
 }
