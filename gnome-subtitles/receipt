@@ -8,10 +8,10 @@ SHORT_DESC="A video subtitling for the GNOME desktop."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.bz2"
 WEB_SITE="http://gnomesubtitles.org/"
-WGET_URL="$SF_MIRROR/$PACKAGE/$TARBALL"
+WGET_URL="$SF_MIRROR/$TARBALL"
 
 DEPENDS=""
-BUILD_DEPENDS="intltool-dev gnome-doc-utils-dev"
+BUILD_DEPENDS="intltool gnome-doc-utils-dev"
 
 # Rules to configure and make the package.
 compile_rules()
