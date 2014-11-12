@@ -23,7 +23,8 @@ compile_rules()
 		|| return 1
 		$CONFIGURE_ARGS &&
 	make || return 1
-	make GACUTIL="/usr/bin/gacutil"		
+	make GACUTIL="/usr/bin/gacutil" \
+		DESTDIR=$DESTDIR install
 }
 
 genpkg_rules()
