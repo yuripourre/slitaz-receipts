@@ -1,0 +1,33 @@
+# SliTaz package receipt.
+
+PACKAGE="gtk-sharp"
+VERSION="2.12.10"
+CATEGORY="utilities"
+LICENSE="LGPL"
+SHORT_DESC="GTK2 bindings for C#"
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WEB_SITE="http://gnomesubtitles.org/"
+WGET_URL="$GNOME_MIRROR/$PACKAGE/${VERSION%.*}/$TARBALL"
+
+DEPENDS="mono libglade gtk+"
+BUILD_DEPENDS="mono-dev libglade-dev gtk+-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure                  \
+		--prefix=/usr        \
+		--sysconfdir=/etc    \
+		--disable-static     \
+		|| return 1
+		$CONFIGURE_ARGS &&
+	make || return 1
+	make GACUTIL="/usr/bin/gacutil"		
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/share
+	cp -a $install/usr/bin $fs/usr
+}

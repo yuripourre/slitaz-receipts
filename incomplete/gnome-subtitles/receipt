@@ -6,12 +6,12 @@ CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="A video subtitling for the GNOME desktop."
 MAINTAINER="yuripourre@gmail.com"
-TARBALL="$PACKAGE-$VERSION.tar.bz2"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://gnomesubtitles.org/"
 WGET_URL="$SF_MIRROR/$PACKAGE/$TARBALL"
 
 DEPENDS=""
-BUILD_DEPENDS="intltool-dev gnome-doc-utils-dev"
+BUILD_DEPENDS="intltool-dev gnome-doc-utils-dev gtk-sharp"
 
 # Rules to configure and make the package.
 compile_rules()
