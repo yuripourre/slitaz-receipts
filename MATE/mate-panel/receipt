@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="mate-panel"
-VERSION="1.9.0"
+VERSION="1.9.1"
 CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Panel where you can run applications and applets using MATE."
@@ -10,7 +10,7 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
-DEPENDS="gtk+ dconf"
+DEPENDS="gtk+ dconf caja"
 BUILD_DEPENDS="wget dconf-dev gtk+-dev autoconf automake libtool itstool \
 mate-common-dev mate-desktop-dev mate-menus-dev yelp-tools dbus-glib-dev \ 
 gobject-introspection-dev gtk-doc libcanberra-dev libwnck-dev librsvg-dev"
