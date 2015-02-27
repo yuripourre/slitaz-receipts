@@ -11,15 +11,21 @@ WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
 DEPENDS="gtk+ dconf caja"
-BUILD_DEPENDS="wget dconf-dev gtk+-dev autoconf automake libtool itstool \
-mate-common-dev mate-desktop-dev mate-menus-dev yelp-tools dbus-glib-dev \ 
-gobject-introspection-dev gtk-doc libcanberra-dev libwnck-dev librsvg-dev"
+BUILD_DEPENDS="wget dconf-dev autoconf automake libtool itstool \
+gtk+-dev mate-common-dev mate-desktop-dev mate-menus-dev yelp-tools \
+harfbuzz-dev gtk-doc gobject-introspection-dev dbus-glib-dev \
+libcanberra-dev libwnck-dev librsvg-dev util-linux-uuid-dev \
+libmateweather libsoup-dev"
 
 # Rules to configure and make the package.
 compile_rules()
 {
 	./autogen.sh                   \
 		--prefix=/usr          \
+		--sysconfdir=/etc \
+		--localstatedir=/var \
+		--enable-introspection \
+		--disable-static
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
