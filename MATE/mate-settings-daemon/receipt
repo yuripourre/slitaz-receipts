@@ -14,7 +14,7 @@ DEPENDS="gtk+ dconf fontconfig"
 BUILD_DEPENDS="wget autoconf automake libtool itstool gtk+-dev \
 mate-common-dev mate-desktop-dev dconf-dev gtk-doc dbus-glib-dev \
 libmatekbd-dev libmatemixer-dev fontconfig-dev libcanberra-dev \
-libnotify-dev xorg-libXt-dev nss-dev mate-polkit-dev util-linux-uuid-dev"
+libnotify-dev xorg-libXt-dev nss-dev polkit-dev util-linux-uuid-dev"
 
 # Rules to configure and make the package.
 compile_rules()
