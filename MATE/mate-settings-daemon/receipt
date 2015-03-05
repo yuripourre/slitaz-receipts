@@ -32,6 +32,10 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr
-	cp -a $install/usr $fs
+	mkdir -p $fs/usr/lib $fs/usr/libexec
+	cp -a $install/usr/etc $fs/usr
+	cp -a $install/usr/share $fs/usr
+	cp -a $install/usr/lib/$PACKAGE/*.so* $fs/usr/lib
+	cp -a $install/usr/lib/$PACKAGE/*settings-plugin $fs/usr/lib
+	cp -a $install/usr/libexec $fs/usr
 }
