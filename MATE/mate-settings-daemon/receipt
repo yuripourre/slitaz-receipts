@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="mate-settings-daemon"
-VERSION="1.9.6"
+VERSION="1.9.1"
 CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Settings daemon for MATE desktop."

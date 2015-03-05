@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="mate-desktop-dev"
-VERSION="1.9.4"
+VERSION="1.9.1"
 CATEGORY="utilities"
 LICENSE="GPL3"
 SHORT_DESC="Common package for MATE Desktop applications."
