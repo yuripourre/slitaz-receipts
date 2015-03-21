@@ -1,8 +1,11 @@
+mate-session-manager (
+ - mate-desktop (1.9.3+) OK
+ - mate-polkit  (1.9.0+) OK
+ - mate-settings-daemon (1.9.5+) OK
+ - xdg-user-dirs
+ - xmlto
+
 mate-power-manager (1.9.0)
  - mate-desktop (1.9.3)
 
-mate-session-manager (
- - mate-desktop (1.9.3+) 
- - mate-polkit  (1.9.0+)
- - mate-settings-daemon (1.9.5+)
 
