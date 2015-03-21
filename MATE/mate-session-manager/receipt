@@ -10,21 +10,23 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
-DEPENDS="gtk+ dconf dbus-lib"
+DEPENDS="gtk+ dconf dbus-lib xdg-user-dirs"
 BUILD_DEPENDS="wget autoconf automake libtool itstool gtk+-dev \
 dconf-dev gtk-doc dbus-glib-dev mate-common-dev mate-desktop-dev \
 mate-polkit-dev mate-settings-daemon ttf-dejavu polkit-dev \
-pangox-compat-dev xorg-libSM-dev xorg-libXtst-dev"
+pangox-compat-dev xorg-libSM-dev xorg-libXtst-dev xmlto \
+util-linux-uuid-dev docbook-xml docbook-xsl"
 
 # Rules to configure and make the package.
 compile_rules()
 {
-	./autogen.sh              \
-		--prefix=/usr     \
-		--sysconfdir=/etc \
-		--disable-static  \
-		--enable-polkit   \
-		--disable-static  \
+	NOCONFIGURE=1 ./autogen.sh     \
+		--prefix=/usr          \
+		--sysconfdir=/etc      \
+		--disable-static       \
+		--enable-polkit        \
+		--disable-upower       \
+		--disable-docbook-docs \
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
