@@ -1,0 +1,31 @@
+# SliTaz package receipt.
+# Forked from https://github.com/archhurd/packages/blob/master/extra/xmlto/PKGBUILD
+
+PACKAGE="xmlto"
+VERSION="0.0.24"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="Tool to convert xml to many other formats."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.bz2"
+WEB_SITE="http://cyberelk.net/tim/software/xmlto/"
+WGET_URL="https://fedorahosted.org/releases/x/m/$PACKAGE/$TARBALL"
+
+DEPENDS="libxslt"
+BUILD_DEPENDS="libxslt-dev perl-yaml-syck perl-test-pod docbook-xsl"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure --prefix= \
+                    --mandir=/share/man
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/bin $fs/usr
+}
