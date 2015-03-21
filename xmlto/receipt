@@ -1,10 +1,10 @@
 # SliTaz package receipt.
-# Forked from https://github.com/archhurd/packages/blob/master/extra/xmlto/PKGBUILD
+# Forked from https://gitorious.org/chakra-packages/platform/source/89f5fdf6ea894c3a187beb7833dfc5ff41875ba6:xmlto/PKGBUILD
 
 PACKAGE="xmlto"
-VERSION="0.0.24"
+VERSION="0.0.23"
 CATEGORY="utilities"
-LICENSE="GPL3"
+LICENSE="GPL"
 SHORT_DESC="Tool to convert xml to many other formats."
 MAINTAINER="yuripourre@gmail.com"
 TARBALL="$PACKAGE-$VERSION.tar.bz2"
@@ -17,8 +17,8 @@ BUILD_DEPENDS="libxslt-dev perl-yaml-syck perl-test-pod docbook-xsl"
 # Rules to configure and make the package.
 compile_rules()
 {
-	./configure --prefix= \
-                    --mandir=/share/man
+	./configure --prefix=/usr \
+                    --mandir=/usr/share/man || return 1
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
