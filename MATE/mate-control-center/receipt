@@ -33,7 +33,12 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/bin $fs/usr/lib
+	mkdir -p $fs/usr/lib $fs/usr/libexec
+	cp -a $install/etc $fs
 	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/sbin $fs/usr
+	cp -a $install/usr/share $fs/usr
 	cp -a $install/usr/lib/*.so* $fs/usr/lib
+	cp -a $install/usr/lib/window-manager-settings/*.so* $fs/usr/lib/window-manager-settings
+	cp -a $install/usr/libexec $fs/usr
 }
