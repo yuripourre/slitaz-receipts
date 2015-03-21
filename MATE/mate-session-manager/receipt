@@ -1,0 +1,41 @@
+# SliTaz package receipt.
+
+PACKAGE="mate-session-manager"
+VERSION="1.9.3"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="Session Handler for MATE desktop."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WEB_SITE="http://www.mate-desktop.org/"
+WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
+
+DEPENDS="gtk+ dconf dbus-lib"
+BUILD_DEPENDS="wget autoconf automake libtool itstool gtk+-dev \
+dconf-dev gtk-doc dbus-glib-dev mate-common-dev mate-desktop-dev \
+mate-polkit-dev mate-settings-daemon ttf-dejavu polkit-dev \
+pangox-compat-dev xorg-libSM-dev xorg-libXtst-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./autogen.sh              \
+		--prefix=/usr     \
+		--sysconfdir=/etc \
+		--disable-static  \
+		--enable-polkit   \
+		--disable-static  \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib $fs/usr/libexec
+	cp -a $install/etc $fs
+	cp -a $install/usr/share $fs/usr
+	cp -a $install/usr/lib/$PACKAGE/*.so* $fs/usr/lib
+	cp -a $install/usr/lib/$PACKAGE/*settings-plugin $fs/usr/lib
+	cp -a $install/usr/libexec $fs/usr
+}
