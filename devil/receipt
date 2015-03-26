@@ -1,0 +1,33 @@
+# SliTaz package receipt.
+
+PACKAGE="devil"
+VERSION="1.7.8"
+CATEGORY="utilities"
+LICENSE="GPL3"
+SHORT_DESC="Cross-Platform Image Library to load, save, manipulate images."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="DevIL-$VERSION.tar.gz"
+WEB_SITE="http://openil.sourceforge.net/"
+WGET_URL="http://downloads.sourceforge.net/openil/TARBALL"
+
+DEPENDS="libxslt freeglut"
+BUILD_DEPENDS="freeglut-dev jasper-dev lcms-dev libpng-dev libsdl"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure --prefix=/usr \
+                    --enable-ILU \
+		    --enable-ILUT \
+		    --enable-opengl \
+		    --enable-sdl \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/bin $fs/usr
+}
