@@ -1,0 +1,23 @@
+diff -rupN mate-session-manager-1.9.3/autogen.sh mate-session-manager-1.9.3-new/autogen.sh
+--- mate-session-manager-1.9.3/autogen.sh	2015-04-02 00:45:16.134823775 -0300
++++ mate-session-manager-1.9.3-new/autogen.sh	2015-04-02 00:45:43.177824225 -0300
+@@ -19,7 +19,7 @@ which mate-autogen || {
+ 
+ REQUIRED_AUTOMAKE_VERSION=1.9
+ USE_MATE2_MACROS=1
+-USE_COMMON_DOC_BUILD=yes
++USE_COMMON_DOC_BUILD=no
+ 
+ . mate-autogen
+ 
+diff -rupN mate-session-manager-1.9.3/Makefile.am mate-session-manager-1.9.3-new/Makefile.am
+--- mate-session-manager-1.9.3/Makefile.am	2014-11-22 09:29:32.000000000 -0200
++++ mate-session-manager-1.9.3-new/Makefile.am	2015-04-02 00:24:09.295802718 -0300
+@@ -4,7 +4,6 @@ SUBDIRS = \
+ 	capplet \
+ 	tools \
+ 	data \
+-	doc \
+ 	po
+ 
+ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
