@@ -10,22 +10,22 @@ TARBALL="$PACKAGE-$VERSION.tar.gz"
 WEB_SITE="http://www.mate-desktop.org/"
 WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 
-DEPENDS="gtk+ dconf caja"
+DEPENDS="gtk+ dconf caja libmateweather"
 BUILD_DEPENDS="wget dconf-dev autoconf automake libtool itstool \
 gtk+-dev mate-common-dev mate-desktop-dev mate-menus-dev yelp-tools \
 harfbuzz-dev gtk-doc gobject-introspection-dev dbus-glib-dev \
 libcanberra-dev libwnck-dev librsvg-dev util-linux-uuid-dev \
-libmateweather libsoup-dev"
+libmateweather-dev libsoup-dev sqlite-dev"
 
 # Rules to configure and make the package.
 compile_rules()
 {
 	./autogen.sh                   \
 		--prefix=/usr          \
-		--sysconfdir=/etc \
-		--localstatedir=/var \
-		--enable-introspection \
-		--disable-static
+		--sysconfdir=/etc      \
+		--localstatedir=/var   \
+		--disable-introspection \
+		--disable-static       \
 		$CONFIGURE_ARGS &&
 	make &&
 	make DESTDIR=$DESTDIR install
@@ -33,6 +33,21 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/share
+	mkdir -p $fs/usr/lib
+	cp -a $install/usr/bin $fs/usr
 	cp -a $install/usr/share $fs/usr
+	cp -a $install/usr/libexec $fs/usr
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+}
+
+post_install()
+{
+	echo "Processing post-install commands..."
+	chroot $1/ /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas
+}
+
+post_remove()
+{
+	echo "Processing post-remove commands..."
+	chroot $1/ /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas
 }
