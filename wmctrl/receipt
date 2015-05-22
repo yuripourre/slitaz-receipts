@@ -1,0 +1,30 @@
+# SliTaz package receipt.
+
+PACKAGE="wmctrl"
+VERSION="1.07"
+CATEGORY="utilities"
+LICENSE="GPL"
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WEB_SITE="https://sites.google.com/site/tstyblo/wmctrl/"
+WGET_URL="https://sites.google.com/site/tstyblo/$PACKAGE/$TARBALL"
+SHORT_DESC="A UNIX/Linux command line tool to interact with an EWMH/NetWM compatible X Window Manager."
+DEPENDS="glib"
+BUILD_DEPENDS="glib-dev"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure                    \
+		--prefix=/usr          \
+		--mandir=/usr/share/man\
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/bin $fs/usr
+}
