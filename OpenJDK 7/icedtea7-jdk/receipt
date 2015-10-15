@@ -16,12 +16,11 @@ BUILD_DEPENDS="gcc+gcj autoconf automake m4 diffutils gawk cups-dev wget cpio \
 coreutils-file-special coreutils-file-summarize alsa-lib-dev file patch perl \
 zip unzip findutils  bzip2 tar glib-dev fastjar rhino ecj apache-ant jpeg-dev \
 xalan-xerces-j gtk+-dev giflib-dev libpng-dev xorg-dev xorg-libXtst-dev \
-xorg-libXp-dev xorg-dev-proto nss nss-dev jdk7-jaxws jdk7-jaxp jdk7-jaf \
-jdk7-corba jdk7-hotspot jdk7-langtools openjdk-7-src"
+xorg-libXp-dev xorg-dev-proto nss nss-dev jdk7-jaxws jdk7-jaxp jdk7-corba \
+jdk7-hotspot jdk7-langtools openjdk-7-src"
 
 # Note to icedtea6 updaters,
 # You should check version into receipts:
-# * jdk7-jaf (compatible version)
 # * jdk7-jaxws (version: $VERSION)
 # * jdk7-jaxp (version: $VERSION)
 # * jdk7-corba (version: $VERSION)
@@ -32,8 +31,7 @@ jdk7-corba jdk7-hotspot jdk7-langtools openjdk-7-src"
 openjdk_version="b147"
 openjdk_date="27_jun_2011"
 OPENJDK_SOURCE_FILE="openjdk-7-fcs-src-$openjdk_version-$openjdk_date.zip"
-ICED_TEA_FILES="jaf7.zip
-corba.tar.bz2 \
+ICED_TEA_FILES="corba.tar.bz2 \
 hotspot.tar.bz2 \
 jaxp.tar.bz2 \
 jaxws.tar.bz2 \
@@ -43,19 +41,17 @@ EXTRA_SOURCE_FILES="$ICED_TEA_FILES $OPENJDK_SOURCE_FILE"
 # Rules to configure and make the package.
 compile_rules()
 {
+	# Apply patches
+	patch -Np1 -i ../../stuff/icedtea-2.5.1-add_cacerts-1.patch
+	patch -Np1 -i ../../stuff/icedtea-2.5.1-fixed_paths-1.patch
+	#patch -Np1 -i ../icedtea-2.5.1-fix_new_giflib-1.patch
+	patch -Np1 -i ../icedtea-2.5.1-fix_tests-1.patch
+
 	# Limit memory usage
 	ulimit -v $(awk '/MemTotal/ { print int(($2*80)/100) }' < /proc/meminfo)
 
 	local JVM_PREFIX
 	JVM_PREFIX="/usr/lib/jvm/java-icedtea"
-	
-	# NOTE: This build does not seem to work with ECJ 3.5
-	local ECJ_VERSION
-	ECJ_VERSION="3.6"
-
-	cd $src
-	mkdir drops
-	sed -i -e 's/mkdir -p drops/true/' -e 's/ jar xf/ fastjar xf/'  Makefile*
 	
 	# Check than all sources files are available, or exit.
 	REPO=http://icedtea.classpath.org/download/drops
@@ -89,24 +85,15 @@ EOT
 		-e 's/--check/-c/' \
 		-e 's/Bsymbolic/& -lgcj/' \
 		-e 's/ln -sfv/ln -sf/' Makefile*
-	autoreconf &&
+	./autogen.sh &&
 	{
 	./configure \
 		--prefix=/usr \
 		--disable-plugin \
 		--disable-docs \
-		--with-ecj \
-		--with-ecj-jar=/usr/share/java/ecj-$ECJ_VERSION.jar \
-		--with-gcj \
-		--with-gcj-home=/usr/lib/jvm/java-gcj \
-		--with-xalan2-jar=/usr/share/java/xalan.jar \
-		--with-xalan2-serializer-jar=/usr/share/java/serializer.jar \
-		--with-xerces2-jar=/usr/share/java/xercesImpl.jar \
-		--with-rhino=/usr/share/java/js.jar \
-		--with-abs-install-dir=$JVM_PREFIX \
+		--with-jdk-home=$JVM_PREFIX \
 		$CONFIGURE_ARGS || return 1
-	make -j 1 ARCH_PREFIX= 2>&1 | sed '/java_lang_ClassLoaderr.NativeLibrary/d'
-	} 2>&1 | sed 's/No such file/no such file/'
+	make
 	
 	echo "Copying needed files to install dir..."
 	rm -rf $DESTDIR
