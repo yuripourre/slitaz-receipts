@@ -1,0 +1,20 @@
+# SliTaz package receipt.
+
+PACKAGE="winmint-metacity-theme"
+VERSION="1.0"
+CATEGORY="x-window"
+LICENSE="Artistic 2.0"
+SHORT_DESC="Winmint is a Metacity theme made by hamidcomdecasa."
+MAINTAINER="yuripourre@gmail.com"
+WEB_SITE="http://gnome-look.org/content/show.php/hamidcom.winmint?content=166586"
+WGET_URL="http://gnome-look.org/CONTENT/content-files/166586-hamidcom.winmint.zip"
+
+DEPENDS="marco"
+BUILD_DEPENDS="wget"
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/share/themes
+	cp -a $src/hamidcom.winmint $fs/usr/share/themes
+}

@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="gaupol"
-VERSION="0.27"
+VERSION="0.25"
 CATEGORY="multimedia"
 SHORT_DESC="Gaupol is an editor for text-based subtitle files."
 MAINTAINER="claudinei@slitaz.org"

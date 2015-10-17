@@ -1,0 +1,29 @@
+# SliTaz package receipt.
+
+PACKAGE="merkaator"
+VERSION="0.18.1"
+CATEGORY="utilities"
+LICENSE="GPL2"
+SHORT_DESC="OpenStreetMap Editos"
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$PACKAGE-$VERSION.tar.bz2"
+WEB_SITE="http://merkaartor.be"
+WGET_URL="$WEB_SITE/attachments/download/301/$TARBALL"
+
+DEPENDS="exiv2 gdal hicolor-icon-theme"
+BUILD_DEPENDS="desktop-file-utils gdal-dev exiv2-dev libQtWebkit"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure \
+		--prefix=/usr \
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	cp -a $install/usr $fs
+}

@@ -1,0 +1,34 @@
+# SliTaz package receipt.
+
+PACKAGE="mate-desktop-environment"
+VERSION="1.9.0"
+CATEGORY="x-window"
+LICENSE="GPL3"
+SHORT_DESC="The MATE Desktop Environment is the continuation of GNOME 2. (meta package)"
+MAINTAINER="yuripourre@gmail.com"
+WEB_SITE="http://www.mate-desktop.org/"
+TAGS="MATE"
+COOK_OPT="!fs"
+
+DEPENDS="marco caja mate-terminal mate-control-center mate-system-monitor \
+mate-panel yuyo-gtk-theme"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	# Replace current window manager
+	sed -i 's/FILE_MANAGER=.*/WINDOW_MANAGER=caja' ~/.config/slitaz/applications.conf
+	sed -i 's/WINDOW_MANAGER=.*/WINDOW_MANAGER="mate-session"' ~/.config/slitaz/applications.conf
+
+	# Execute marco on startup
+        echo "marco --replace" >> /etc/init.d/local.sh
+}
+
+post_install()
+{
+        # Replace current window manager
+	sed -i 's/WINDOW_MANAGER=.*/WINDOW_MANAGER="mate-session"' ~/.config/slitaz/applications.conf
+
+	# Execute marco on startup
+        echo "marco" >> /etc/init.d/local.sh
+}

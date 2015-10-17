@@ -12,7 +12,7 @@ WGET_URL="http://www.jejik.com/files/gnome-hearts/$TARBALL"
 
 DEPENDS="gtk+ libglade python libgnomeui libgnome-keyring"
 BUILD_DEPENDS="gtk+-dev libglade-dev python-dev libgnome-dev \
-libgnomeui-dev glib-dev itstool scrollkeeper-dev"
+libgnomeui-dev glib-dev itstool scrollkeeper"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -26,7 +26,7 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/bin $fs/usr/share
+	mkdir -p $fs/usr/share
 	cp -a $install/usr/bin $fs/usr
 	cp -a $install/usr/share/pixmaps $fs/usr/share
 	cp -a $install/usr/share/$PACKAGE $fs/usr/share

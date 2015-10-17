@@ -1,0 +1,8 @@
+Rust receipt draft
+
+BUILD_DEPENDS=(file)
+
+wget http://static.rust-lang.org/rustup.sh
+sh rustup.sh
+change all CFG_CURL -f
+to CFG_CURL -f -k

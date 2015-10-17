@@ -1,0 +1,33 @@
+# SliTaz package receipt.
+
+PACKAGE="make-human"
+VERSION="1.0.2"
+CATEGORY="utilities"
+LICENSE="LGPL"
+SHORT_DESC="Software to generate human based 3d models"
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$VERSION.zip"
+WEB_SITE="http://http://www.makehuman.org/"
+WGET_URL="http://bitbucket.org/MakeHuman/makehuman/get/${TARBALL}"
+
+DEPENDS=""
+BUILD_DEPENDS=""
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	./configure                  \
+		--prefix=/usr        \
+		--sysconfdir=/etc    \
+		--disable-static     \
+		|| return 1
+		$CONFIGURE_ARGS &&
+	make &&
+	make DESTDIR=$DESTDIR install
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/share
+	cp -a $install/usr/bin $fs/usr
+}
