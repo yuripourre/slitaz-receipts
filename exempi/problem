@@ -1,9 +1,0 @@
-Defines:
-
-	EXEMPI_PLATFORM_DEF  = UNIX_ENV
-	CPPFLAGS             =
-	LDFLAGS              =
-	Thread Local Storage = __thread
-	Run unit test        = yes
-
-/usr/bin/cook: line 31: --build=i486-slitaz-linux: not found

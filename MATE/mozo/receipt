@@ -1,7 +1,7 @@
 # SliTaz package receipt.
 
 PACKAGE="mozo"
-VERSION="1.9.0"
+VERSION="1.8.0"
 CATEGORY="x-window"
 LICENSE="GPL3"
 SHORT_DESC="MATE menu editing tool"
@@ -12,12 +12,13 @@ WGET_URL="https://github.com/mate-desktop/$PACKAGE/archive/$TARBALL"
 TAGS="MATE"
 
 DEPENDS="gtk+ mate-menus pygtk pygobject"
-BUILD_DEPENDS="wget gtk+-dev mate-common-dev"
+BUILD_DEPENDS="wget gtk+-dev autoconf automake mate-common-dev \
+mate-desktop-dev mate-menus-dev pygobject-dev"
 
 # Rules to configure and make the package.
 compile_rules()
 {
-	PYTHON=/usr/bin/python2 ./configure\
+	./autogen.sh
 		--prefix=/usr              \
 		$CONFIGURE_ARGS &&
 	make &&
@@ -27,5 +28,6 @@ compile_rules()
 genpkg_rules()
 {
 	mkdir -p $fs/usr/lib
-	cp -a $install/usr $fs
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/share $fs/usr
 }
