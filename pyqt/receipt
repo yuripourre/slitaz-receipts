@@ -1,0 +1,34 @@
+# SliTaz package receipt.
+
+PACKAGE="PyQt-x11-gpl"
+VERSION="4.11.3"
+CATEGORY="development"
+SHORT_DESC="PyQt"
+MAINTAINER="allan316@gmail.com"
+LICENSE="GPL"
+WEB_SITE="http://www.riverbankcomputing.com/software/pyqt/intro"
+TARBALL="$PACKAGE-$VERSION.tar.gz"
+WGET_URL="$SF_MIRROR/pyqt/$TARBALL"
+
+DEPENDS="python libQtDesigner libQtScript  libQtCore libQtGui \
+libQtWebkit libQtXml libQtNetwork libQtSvg libQtSql \
+libQtOpenGL libQtDBus libQtClucene sip gcc-lib-base dbus"
+BUILD_DEPENDS="python-dev python-opengl sip-dev Qt4-dev qmake"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	yes yes | python configure.py
+	make $MAKEFLAGS &&
+	make DESTDIR=$DESTDIR install
+}
+
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/lib $fs/usr
+	cp -a $install/usr/share $fs/usr
+}
+
