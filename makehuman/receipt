@@ -1,0 +1,49 @@
+# SliTaz package receipt.
+# Based on https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=makehuman
+
+PACKAGE="makehuman"
+VERSION="1.0.2"
+CATEGORY="utilities"
+LICENSE="AGPL3"
+SHORT_DESC="Parametrical modeling program for creating 3D human bodies."
+MAINTAINER="yuripourre@gmail.com"
+TARBALL="$VERSION.zip"
+WEB_SITE="http://www.makehuman.org"
+WGET_URL="https://bitbucket.org/MakeHuman/makehuman/get/$TARBALL"
+
+DEPENDS="python2-numpy python2-pyqt4 python2-opengl"
+BUILD_DEPENDS="cacerts wget python2"
+
+# Rules to configure and make the package.
+compile_rules()
+{
+	# make sure that we are using python2
+	find . -type f -name "*.py" -exec sed -i 's/^#!.*python$/&2/' '{}' ';'
+	sed -i 's|python"|python2"|' buildscripts/build_prepare.py
+	
+	cd build
+	python2 build_prepare.py "$src/makehuman" "$src/build"
+	cd "$src/build/makehuman"
+	# make sure that we are using python2 once again, because the build_prepare.py may have donwloaded some new files
+	find . -type f -name "*.py" -exec sed -i 's/^#!.*python$/&2/' '{}' ';'
+	# compile all modules so that they can be tracked by pacman
+	python2 -m compileall .
+	# and also optimize them
+	python2 -OO -m compileall .
+}
+
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib/$PACKAGE $fs/usr/share/$PACKAGE
+	cp -a $install/usr/bin $fs/usr
+	cp -a $install/usr/lib/*.so* $fs/usr/lib
+	cp -a $install/usr/lib/$PACKAGE/* $fs/usr/lib/$PACKAGE
+	cp -a $install/usr/share/$PACKAGE/* $fs/usr/share/$PACKAGE
+
+	install -d -m755 "$PACKAGE/opt/"
+	cp -a "$install/build/makehuman" "$PACKAGE/opt/"
+
+	install -D -m644 "$install/build/makehuman/icons/makehuman.png" "$fs/usr/share/pixmaps/makehuman.png"
+	install -D -m755 "$install/$PACKAGE.sh" "$fs/usr/bin/$PACKAGE"
+	install -D -m644 "$install/$PACKAGE.desktop" "$fs/usr/share/applications/$PACKAGE.desktop"
+}
