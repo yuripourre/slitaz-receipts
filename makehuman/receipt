@@ -11,8 +11,8 @@ TARBALL="$VERSION.zip"
 WEB_SITE="http://www.makehuman.org"
 WGET_URL="https://bitbucket.org/MakeHuman/makehuman/get/$TARBALL"
 
-DEPENDS="python2-numpy python2-pyqt4 python2-opengl"
-BUILD_DEPENDS="cacerts wget python2"
+DEPENDS="python-numpy python-pyqt4 python-opengl"
+BUILD_DEPENDS="cacerts wget python"
 
 # Rules to configure and make the package.
 compile_rules()
@@ -21,9 +21,9 @@ compile_rules()
 	find . -type f -name "*.py" -exec sed -i 's/^#!.*python$/&2/' '{}' ';'
 	sed -i 's|python"|python2"|' buildscripts/build_prepare.py
 	
-	cd build
-	python2 build_prepare.py "$src/makehuman" "$src/build"
-	cd "$src/build/makehuman"
+	cd buildscripts
+	python2 build_prepare.py "$src/makehuman"
+	cd "$src/makehuman"
 	# make sure that we are using python2 once again, because the build_prepare.py may have donwloaded some new files
 	find . -type f -name "*.py" -exec sed -i 's/^#!.*python$/&2/' '{}' ';'
 	# compile all modules so that they can be tracked by pacman
@@ -34,16 +34,9 @@ compile_rules()
 
 genpkg_rules()
 {
-	mkdir -p $fs/usr/lib/$PACKAGE $fs/usr/share/$PACKAGE
-	cp -a $install/usr/bin $fs/usr
-	cp -a $install/usr/lib/*.so* $fs/usr/lib
-	cp -a $install/usr/lib/$PACKAGE/* $fs/usr/lib/$PACKAGE
-	cp -a $install/usr/share/$PACKAGE/* $fs/usr/share/$PACKAGE
-
-	install -d -m755 "$PACKAGE/opt/"
-	cp -a "$install/build/makehuman" "$PACKAGE/opt/"
-
-	install -D -m644 "$install/build/makehuman/icons/makehuman.png" "$fs/usr/share/pixmaps/makehuman.png"
-	install -D -m755 "$install/$PACKAGE.sh" "$fs/usr/bin/$PACKAGE"
-	install -D -m644 "$install/$PACKAGE.desktop" "$fs/usr/share/applications/$PACKAGE.desktop"
+	cp -a "makehuman" "$fs/opt/"
+	install -d -m755 "$fs/opt/$PACKAGE"
+	install -D -m644 "$$PACKAGE/icons/makehuman.png" "$fs/usr/share/pixmaps/makehuman.png"
+	install -D -m755 "$PACKAGE.sh" "$fs/usr/bin/$PACKAGE"
+	install -D -m644 "$PACKAGE.desktop" "$fs/usr/share/applications/$PACKAGE.desktop"
 }
